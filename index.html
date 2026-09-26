@@ -295,30 +295,40 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 0.85rem;
       border-radius: var(--radius-sm);
       color: var(--sidebar-text);
       cursor: pointer;
       text-decoration: none;
       font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       transition: var(--transition);
     }
 
     .sidebar-item-content {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.75rem;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
     }
 
     .sidebar-item i {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       width: 22px;
+      min-width: 22px;
+      flex-shrink: 0; /* Icon is fixed and always visible */
       text-align: center;
       color: var(--primary-color);
+    }
+
+    .sidebar-item span {
+      font-size: 0.88rem;
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .sidebar-item:hover {
@@ -613,28 +623,40 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      height: calc(100vh - 67px);
+      height: 100%;
+      min-height: calc(100vh - 65px);
       background-color: var(--card-bg);
       position: relative;
+      flex: 1;
     }
 
     .embed-toolbar {
-      padding: 0.6rem 1.25rem;
+      padding: 0.5rem 0.85rem;
       background-color: var(--card-bg);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 0.5rem;
+      flex-wrap: nowrap;
     }
 
     .embed-title {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 0.92rem;
       color: var(--text-main);
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .embed-title span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .embed-frame-container {
@@ -642,13 +664,16 @@
       position: relative;
       width: 100%;
       height: 100%;
+      min-height: calc(100vh - 120px);
       overflow: hidden;
     }
 
     .embed-iframe {
       width: 100%;
       height: 100%;
+      min-height: calc(100vh - 120px);
       border: none;
+      display: block;
     }
 
     /* Loading Spinner */
@@ -1072,19 +1097,18 @@
       <div id="embedView" class="embedded-system-view" style="display: none;">
         <div class="embed-toolbar">
           <div class="embed-title">
-            <i class="fa-solid fa-globe" id="embedIcon"></i>
+            <i class="fa-solid fa-globe" id="embedIcon" style="font-size: 1.1rem; color: var(--primary-color); flex-shrink: 0;"></i>
             <span id="embedSystemTitle">ชื่อระบบ</span>
-            <span class="badge badge-primary" id="embedUrlBadge">URL</span>
           </div>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="display: flex; gap: 0.4rem; flex-shrink: 0;">
             <button class="btn btn-outline btn-icon" onclick="reloadEmbedIframe()" title="รีโหลดหน้านี้">
               <i class="fa-solid fa-rotate-right"></i>
             </button>
-            <button class="btn btn-outline" onclick="openEmbedInNewWindow()" title="เปิดในหน้าต่างใหม่">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> เปิดลิงก์ตรง
+            <button class="btn btn-outline" onclick="openEmbedInNewWindow()" title="เปิดในหน้าต่างใหม่" style="padding: 0.4rem 0.65rem; font-size: 0.8rem;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="btn-text">เปิดลิงก์ตรง</span>
             </button>
-            <button class="btn btn-secondary" onclick="showHomeView()">
-              <i class="fa-solid fa-xmark"></i> ปิดหน้านี้
+            <button class="btn btn-secondary" onclick="showHomeView()" style="padding: 0.4rem 0.65rem; font-size: 0.8rem;">
+              <i class="fa-solid fa-xmark"></i> <span class="btn-text">ปิดหน้านี้</span>
             </button>
           </div>
         </div>
@@ -1763,7 +1787,6 @@
       setActiveTab(String(sysId));
 
       document.getElementById('embedSystemTitle').textContent = sys.name;
-      document.getElementById('embedUrlBadge').textContent = sys.url;
       document.getElementById('embedIcon').className = sys.icon || 'fa-solid fa-globe';
 
       const iframe = document.getElementById('systemIframe');

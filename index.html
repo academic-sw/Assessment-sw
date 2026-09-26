@@ -1521,17 +1521,6 @@
       updateAuthUI();
     }
 
-      loadThemeConfig();
-
-      if (localStorage.getItem(STORAGE_KEY_AUTH) === 'true') {
-        isAdmin = true;
-      }
-
-      renderSidebarMenu();
-      renderNewsFeed();
-      updateAuthUI();
-    }
-
     function loadLocalData() {
       const savedNews = localStorage.getItem(STORAGE_KEY_NEWS);
       newsList = savedNews ? JSON.parse(savedNews) : defaultNewsData;

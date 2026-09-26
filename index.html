@@ -1,0 +1,3569 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบสารสนเทศงานวัดและประเมินผล โรงเรียนเสาไห้ "วิมลวิทยานุกูล"</title>
+  <meta name="description" content="ระบบสารสนเทศงานวัดและประเมินผล โรงเรียนเสาไห้ วิมลวิทยานุกูล - ระบบบริหารจัดการและบริการข้อมูลวัดผลการเรียนรู้">
+  
+  <!-- Google Fonts: Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- SweetAlert2 CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      /* Theme Palette: Pastel Green, White, Pastel Yellow, Slate Text */
+      --primary: #2e7d32;             /* Deep readable pastel green text/branding */
+      --primary-green: #66bb6a;       /* Vibrant pastel green */
+      --pastel-green-light: #e8f5e9;  /* Soft pastel green background */
+      --pastel-green-hover: #c8e6c9;  /* Hover green */
+      --pastel-yellow: #fff9c4;       /* Pastel yellow highlight */
+      --pastel-yellow-dark: #fbc02d;  /* Darker pastel yellow border/accent */
+      --pastel-yellow-badge: #fef08a; /* Yellow badge background */
+      
+      --bg-body: #f4f8f5;
+      --card-bg: #ffffff;
+      --text-dark: #1e293b;           /* High contrast slate */
+      --text-muted: #475569;          /* Medium contrast slate */
+      --border-color: #e2e8f0;
+      
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --warning: #f59e0b;
+      
+      --shadow-sm: 0 2px 6px rgba(46, 125, 50, 0.05);
+      --shadow-md: 0 4px 16px rgba(46, 125, 50, 0.08);
+      --shadow-lg: 0 10px 30px rgba(46, 125, 50, 0.12);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: 'Kanit', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-dark);
+      line-height: 1.6;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #a8e6cf;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #81c784;
+    }
+
+    /* Global Layout */
+    #app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Loading Spinner Overlay */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(6px);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .loader-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .spinner-ring {
+      width: 58px;
+      height: 58px;
+      border: 5px solid var(--pastel-green-light);
+      border-top: 5px solid var(--primary);
+      border-right: 5px solid var(--pastel-yellow-dark);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loader-text {
+      margin-top: 14px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Header Bar */
+    .site-header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--pastel-green-light);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      max-width: 100%;
+      gap: 1rem;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+
+    .brand-logo-wrapper {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo {
+      height: 50px;
+      width: auto;
+      max-width: 190px;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .brand-title-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--primary);
+      line-height: 1.25;
+    }
+
+    .brand-subtitle {
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* Buttons & Badges */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      font-family: 'Kanit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .w-100 {
+      width: 100%;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.825rem;
+    }
+
+    .btn-icon-only {
+      padding: 0.45rem 0.6rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.25);
+    }
+    .btn-primary:hover {
+      background-color: #256628;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
+    }
+
+    .btn-pastel-yellow {
+      background-color: var(--pastel-yellow-badge);
+      color: #744210;
+      border: 1px solid var(--pastel-yellow-dark);
+      font-weight: 600;
+    }
+    .btn-pastel-yellow:hover {
+      background-color: #fde047;
+      color: #451a03;
+    }
+
+    .btn-outline-green {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline-green:hover {
+      background: var(--pastel-green-light);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-dark);
+      border: 1px solid #cbd5e1;
+    }
+    .btn-ghost:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+    }
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-size: 0.775rem;
+      font-weight: 500;
+    }
+
+    .badge-green {
+      background-color: var(--pastel-green-light);
+      color: var(--primary);
+      border: 1px solid #a8e6cf;
+    }
+
+    .badge-yellow {
+      background-color: var(--pastel-yellow);
+      color: #854d0e;
+      border: 1px solid #fef08a;
+    }
+
+    .badge-admin {
+      background-color: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fcd34d;
+      font-weight: 600;
+    }
+
+    .badge-danger {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    /* Main Container (Sidebar + Content) */
+    .main-body {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 290px;
+      background: var(--card-bg);
+      border-right: 2px solid var(--pastel-green-light);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+      z-index: 90;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 1rem 1.15rem 0.75rem;
+      border-bottom: 1px dashed var(--pastel-green-hover);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0.75rem 0.6rem;
+      overflow-y: auto;
+      max-height: calc(100vh - 220px);
+    }
+
+    .nav-item {
+      margin-bottom: 0.35rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-md);
+      color: var(--text-dark);
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 0.925rem;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      background-color: var(--pastel-green-light);
+      color: var(--primary);
+    }
+
+    .nav-link.active {
+      background-color: var(--pastel-green-light);
+      color: var(--primary);
+      font-weight: 600;
+      border-color: #a8e6cf;
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
+    }
+
+    .nav-link-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .nav-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      background: rgba(102, 187, 106, 0.15);
+      color: var(--primary);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .nav-link.active .nav-icon {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .nav-text {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .admin-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      opacity: 0.85;
+    }
+
+    .admin-item-actions:hover {
+      opacity: 1;
+    }
+
+    .btn-action-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: none;
+      background: #f1f5f9;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      transition: var(--transition);
+    }
+    .btn-action-icon:hover {
+      background: var(--primary-green);
+      color: #ffffff;
+    }
+    .btn-action-icon.delete:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+
+    .sidebar-footer-admin {
+      padding: 0.85rem;
+      border-top: 1px solid var(--border-color);
+      background: #fbfdfc;
+    }
+
+    .admin-action-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg-body);
+      min-height: calc(100vh - 120px);
+    }
+
+    .page-view {
+      display: none;
+      flex: 1;
+      padding: 1.5rem;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .page-view.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero Banner Styling */
+    .hero-banner {
+      background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 50%, #fff9c4 100%);
+      border: 1px solid #a8e6cf;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 140px;
+      height: 140px;
+      background: rgba(254, 240, 138, 0.4);
+      border-radius: 50%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 850px;
+    }
+
+    .hero-badge {
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* News & PR Announcements Section (ข่าวประชาสัมพันธ์) */
+    .news-section-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.75rem;
+    }
+
+    .news-feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .news-card-block {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--primary-green);
+      padding: 1.35rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .news-card-block:hover {
+      border-color: #81c784;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .news-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .news-meta-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .news-date {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .news-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
+      line-height: 1.35;
+      margin-bottom: 0.65rem;
+    }
+
+    .news-content {
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      white-space: pre-line;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* Attached Images Grid (Multiple Images) */
+    .news-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .news-img-wrapper {
+      aspect-ratio: 4 / 3;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      position: relative;
+      background: #f8fafc;
+    }
+
+    .news-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .news-img-wrapper:hover img {
+      transform: scale(1.08);
+    }
+
+    .news-img-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(46, 125, 50, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.25rem;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .news-img-wrapper:hover .news-img-overlay {
+      opacity: 1;
+    }
+
+    /* File Attachments (File 1, File 2, File 3) */
+    .news-files-box {
+      background: var(--pastel-green-light);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      border: 1px dashed #a8e6cf;
+    }
+
+    .news-files-title {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .news-files-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .news-file-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: #ffffff;
+      border: 1px solid #a8e6cf;
+      border-radius: var(--radius-sm);
+      color: var(--primary);
+      font-size: 0.825rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .news-file-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
+    }
+
+    /* Instruction Guide Card Section */
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .guide-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.75rem;
+    }
+
+    .guide-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .step-box {
+      background: var(--pastel-green-light);
+      border-left: 4px solid var(--primary-green);
+      border-radius: var(--radius-md);
+      padding: 1.15rem;
+      transition: var(--transition);
+    }
+
+    .step-box:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 0.975rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .step-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* System Grid Cards */
+    .systems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .system-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .system-card:hover {
+      border-color: #81c784;
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--pastel-green-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .card-info {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+
+    .card-category {
+      font-size: 0.775rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.85rem;
+      margin-top: auto;
+    }
+
+    /* Table styling for overflow */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+      font-size: 0.9rem;
+    }
+
+    .data-table th {
+      background: var(--pastel-green-light);
+      color: var(--primary);
+      font-weight: 600;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid #a8e6cf;
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    .data-table tr:hover {
+      background: #f8fafc;
+    }
+
+    /* Embedded Subsystem View (Full Screen / Full Section) */
+    #view-embedded {
+      padding: 0 !important;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 115px);
+      min-height: calc(100vh - 115px);
+      width: 100%;
+    }
+
+    .embedded-view-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      background: #ffffff;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+      height: 100%;
+      min-height: calc(100vh - 115px);
+      width: 100%;
+    }
+
+    .iframe-toolbar {
+      background: rgba(248, 250, 252, 0.98);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.3rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      height: 40px;
+      min-height: 40px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .iframe-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .iframe-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .iframe-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .btn-xs {
+      padding: 0.25rem 0.55rem;
+      font-size: 0.775rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .iframe-wrapper {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 40px);
+      min-height: 500px;
+      background: #ffffff;
+    }
+
+    .iframe-element {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .iframe-loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .iframe-loading.hidden {
+      display: none !important;
+    }
+
+    /* Modal Backdrop & Dialog */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.94);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+    }
+
+    .modal-backdrop.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 1.15rem 1.35rem;
+      background: var(--pastel-green-light);
+      border-bottom: 1px solid #a8e6cf;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .modal-close-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: var(--text-dark);
+    }
+
+    .modal-body {
+      padding: 1.35rem;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.35rem;
+      background: #f8fafc;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.65rem;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      font-family: 'Kanit', sans-serif;
+      font-size: 0.925rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      color: var(--text-dark);
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.25);
+    }
+
+    .icon-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .icon-option {
+      height: 40px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .icon-option:hover, .icon-option.selected {
+      border-color: var(--primary);
+      background: var(--pastel-green-light);
+      color: var(--primary);
+    }
+
+    /* Footer Credits */
+    .site-footer {
+      background: #ffffff;
+      border-top: 2px solid var(--pastel-green-light);
+      padding: 1.25rem;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    .footer-credits {
+      font-size: 0.925rem;
+      color: var(--primary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Top Horizontal Scrollable Tab Bar (Mobile/iPad/Tablet & Desktop) */
+    .top-scroll-tabs-container {
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--pastel-green-light);
+      padding: 0.4rem 0.75rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 66px;
+      z-index: 95;
+    }
+    .top-scroll-tabs-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .top-scroll-tabs-container::-webkit-scrollbar-thumb {
+      background: var(--primary-green);
+      border-radius: 4px;
+    }
+    .top-scroll-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .top-scroll-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      background: var(--pastel-green-light);
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition);
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    .top-scroll-tab:hover {
+      background: var(--pastel-green-hover);
+      color: var(--primary);
+    }
+    .top-scroll-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(46, 125, 50, 0.25);
+    }
+    .top-scroll-tab .tab-icon {
+      font-size: 0.85rem;
+    }
+
+    /* Responsive Mobile Nav Drawer & Typography */
+    .mobile-nav-toggle {
+      display: none;
+    }
+
+    @media (max-width: 991.98px) {
+      .mobile-nav-toggle {
+        display: inline-flex;
+      }
+
+      .header-container {
+        padding: 0.5rem 0.85rem;
+        gap: 0.5rem;
+      }
+
+      .brand-logo {
+        height: 40px;
+        max-width: 140px;
+      }
+
+      .brand-title {
+        font-size: 0.9rem;
+        line-height: 1.25;
+      }
+
+      .main-body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        position: fixed;
+        top: 110px;
+        left: 0;
+        height: calc(100vh - 110px);
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: 1.35rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .d-none-mobile {
+        display: none !important;
+      }
+      .page-view {
+        padding: 0.85rem;
+      }
+    }
+
+    /* DARK MODE STYLING */
+    html[data-theme="dark"] {
+      --bg-body: #0f172a;
+      --card-bg: #1e293b;
+      --text-dark: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      
+      --pastel-green-light: #162e21;
+      --pastel-green-hover: #1e3e2b;
+      --pastel-yellow: #332b12;
+      --pastel-yellow-dark: #f59e0b;
+      --pastel-yellow-badge: #42350a;
+      
+      --danger-bg: #451a1a;
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    html[data-theme="dark"] .site-header {
+      background: rgba(30, 41, 59, 0.95);
+      border-bottom-color: #334155;
+    }
+
+    html[data-theme="dark"] .sidebar {
+      background: #1e293b;
+      border-right-color: #334155;
+    }
+
+    html[data-theme="dark"] .hero-banner {
+      background: linear-gradient(135deg, #132a1e 0%, #1e293b 50%, #2b2713 100%);
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .hero-title {
+      color: var(--primary-green);
+    }
+
+    html[data-theme="dark"] .hero-subtitle {
+      color: #cbd5e1;
+    }
+
+    html[data-theme="dark"] .news-card-block {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .news-title {
+      color: var(--primary-green);
+    }
+
+    html[data-theme="dark"] .news-content {
+      color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .guide-card,
+    html[data-theme="dark"] .news-section-card {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .system-card {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .system-card:hover {
+      border-color: var(--primary-green);
+    }
+
+    html[data-theme="dark"] .card-title {
+      color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .card-desc {
+      color: #94a3b8;
+    }
+
+    html[data-theme="dark"] .modal-box {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .modal-header {
+      background: #0f172a;
+      border-bottom-color: #334155;
+    }
+
+    html[data-theme="dark"] .modal-footer {
+      background: #0f172a;
+      border-top-color: #334155;
+    }
+
+    html[data-theme="dark"] .form-control {
+      background: #0f172a;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .form-label {
+      color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .site-footer {
+      background: #1e293b;
+      border-top-color: #334155;
+    }
+
+    html[data-theme="dark"] .footer-sub {
+      color: #94a3b8;
+    }
+
+    html[data-theme="dark"] .data-table {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .data-table th {
+      background: #0f172a;
+      color: var(--primary-green);
+      border-bottom-color: #334155;
+    }
+
+    html[data-theme="dark"] .data-table td {
+      border-bottom-color: #334155;
+      color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .data-table tr:hover {
+      background: #334155;
+    }
+
+    html[data-theme="dark"] .table-container {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .embedded-view-container {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .iframe-toolbar {
+      background: #0f172a;
+      border-bottom-color: #334155;
+    }
+
+    html[data-theme="dark"] .iframe-loading {
+      background: #0f172a;
+    }
+
+    html[data-theme="dark"] .news-files-box {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .news-file-btn {
+      background: #1e293b;
+      color: var(--primary-green);
+      border-color: #334155;
+    }
+
+    html[data-theme="dark"] .news-file-btn:hover {
+      background: var(--primary-green);
+      color: #0f172a;
+    }
+
+    html[data-theme="dark"] .sidebar-footer-admin {
+      background: #0f172a;
+      border-top-color: #334155;
+    }
+
+    html[data-theme="dark"] .step-box {
+      background: #0f172a;
+    }
+
+    html[data-theme="dark"] .step-title {
+      color: #f8fafc;
+    }
+
+    html[data-theme="dark"] .step-desc {
+      color: #94a3b8;
+    }
+
+    html[data-theme="dark"] .btn-ghost {
+      color: #f8fafc;
+      border-color: #475569;
+    }
+
+    html[data-theme="dark"] .btn-ghost:hover {
+      background: #334155;
+    }
+
+    html[data-theme="dark"] .loader-overlay {
+      background: rgba(15, 23, 42, 0.94);
+    }
+
+    html[data-theme="dark"] .theme-palette-card {
+      background: #0f172a !important;
+      border-color: #334155 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div id="app">
+
+    <!-- Global Loading Spinner Overlay -->
+    <div id="globalLoader" class="loader-overlay hidden">
+      <div class="spinner-ring"></div>
+      <div class="loader-text" id="loaderMessage">กำลังโหลดข้อมูล...</div>
+    </div>
+
+    <!-- Header Bar -->
+    <header class="site-header">
+      <div class="header-container">
+        
+        <!-- Left: Brand Logo & Title -->
+        <a href="javascript:void(0)" onclick="switchTab('home')" class="header-brand">
+          <div class="brand-logo-wrapper">
+            <img id="headerLogo" src="" alt="โลโก้โรงเรียนเสาไห้ วิมลวิทยานุกูล" class="brand-logo">
+          </div>
+          <div class="brand-title-group">
+            <h1 class="brand-title" id="siteHeaderTitle">ระบบสารสนเทศงานวัดและประเมินผล</h1>
+            <span class="brand-subtitle">โรงเรียนเสาไห้ "วิมลวิทยานุกูล"</span>
+          </div>
+        </a>
+
+        <!-- Right: Actions & Login -->
+        <div class="header-actions">
+          <!-- Admin Only Theme Controls -->
+          <div id="adminThemeHeaderContainer" style="display: none; align-items: center; gap: 0.35rem;">
+            <button class="btn btn-ghost btn-sm" onclick="openModal('themeModal')" title="ปรับแต่งโทนสีเว็บไซต์">
+              <i class="fa-solid fa-palette" style="color: var(--primary);"></i>
+              <span class="d-none-mobile">โทนสี</span>
+            </button>
+            <button class="btn btn-ghost btn-sm" id="btnThemeToggle" onclick="toggleDarkMode()" title="สลับโหมดมืด/โหมดสว่าง">
+              <i class="fa-solid fa-moon"></i>
+              <span class="d-none-mobile" id="themeToggleText">โหมดมืด</span>
+            </button>
+          </div>
+
+          <button class="btn btn-outline-green btn-sm" onclick="openModal('guideModal')" title="คู่มือการใช้งานระบบ">
+            <i class="fa-solid fa-circle-question"></i>
+            <span class="d-none-mobile">คำแนะนำการใช้งาน</span>
+          </button>
+
+          <!-- Admin Auth Container -->
+          <div id="authNavContainer">
+            <!-- Rendered by JS based on login status -->
+          </div>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button class="btn btn-ghost btn-icon-only mobile-nav-toggle" onclick="toggleMobileSidebar()" aria-label="เมนู">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Top Horizontal Scrollable Nav Tabs (For Phone, iPad & Desktop Swipe) -->
+    <nav class="top-scroll-tabs-container">
+      <ul class="top-scroll-tabs" id="topScrollTabsList">
+        <!-- Rendered dynamically by JS -->
+      </ul>
+    </nav>
+
+    <!-- Main Workspace (Sidebar + Dynamic Views) -->
+    <div class="main-body">
+
+      <!-- Left Sidebar Navigation -->
+      <aside class="sidebar" id="mainSidebar">
+        <div>
+          <div class="sidebar-header">
+            <div class="sidebar-title">
+              <i class="fa-solid fa-list-check"></i>
+              <span>เมนูระบบงานวัดผล</span>
+            </div>
+            <span class="badge badge-green" id="systemCountBadge">0 ระบบ</span>
+          </div>
+
+          <ul class="sidebar-menu" id="sidebarMenuList">
+            <!-- Sidebar Items rendered by JS -->
+          </ul>
+        </div>
+
+        <!-- Admin Control Footer in Sidebar -->
+        <div id="adminSidebarFooter" class="sidebar-footer-admin" style="display: none;">
+          <div class="admin-action-btn-group">
+            <button class="btn btn-pastel-yellow btn-sm w-100" onclick="openAddNewsModal()">
+              <i class="fa-solid fa-bullhorn"></i> เพิ่มข่าวประชาสัมพันธ์
+            </button>
+            <button class="btn btn-primary btn-sm w-100" onclick="openAddSystemModal()">
+              <i class="fa-solid fa-plus-circle"></i> เพิ่มระบบใหม่
+            </button>
+            <button class="btn btn-outline-green btn-sm w-100" onclick="openModal('logoModal')">
+              <i class="fa-solid fa-image"></i> เปลี่ยนโลโก้
+            </button>
+            <button class="btn btn-outline-green btn-sm w-100" onclick="openModal('themeModal')">
+              <i class="fa-solid fa-palette"></i> เลือกโทนสี / โหมดมืด
+            </button>
+            <button class="btn btn-ghost btn-sm w-100" onclick="openModal('footerModal')">
+              <i class="fa-solid fa-pen-to-square"></i> แก้ไขข้อความท้ายเว็บ
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Dynamic Content Views -->
+      <main class="content-area">
+
+        <!-- 1. HOME VIEW (หน้าแรก) -->
+        <section id="view-home" class="page-view active">
+          
+          <!-- Hero Banner -->
+          <div class="hero-banner">
+            <div class="hero-content">
+              <div class="hero-badge">
+                <span class="badge badge-yellow">
+                  <i class="fa-solid fa-star"></i> ระบบสารสนเทศเพื่อการบริหารและการจัดการเรียนรู้
+                </span>
+              </div>
+              <h2 class="hero-title">ระบบสารสนเทศงานวัดและประเมินผล</h2>
+              <p class="hero-subtitle">
+                โรงเรียนเสาไห้ "วิมลวิทยานุกูล" อำเภอเสาไห้ จังหวัดสระบุรี
+              </p>
+              <div class="hero-btn-group">
+                <button class="btn btn-primary" onclick="openModal('guideModal')">
+                  <i class="fa-solid fa-book-open"></i> อ่านคำแนะนำการใช้งาน
+                </button>
+                <a href="#systemSection" class="btn btn-pastel-yellow">
+                  <i class="fa-solid fa-layer-group"></i> เลือกเข้าใช้งานระบบ
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- News PR Announcements Feed Section (ข่าวประชาสัมพันธ์) -->
+          <div class="news-section-card">
+            <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-bullhorn" style="color: var(--primary);"></i>
+                <span>ข่าวประชาสัมพันธ์ล่าสุด</span>
+                <span class="badge badge-green" id="newsCountBadge">0 ข่าว</span>
+              </div>
+              <div id="adminNewsBtnTop">
+                <!-- Rendered dynamically if admin -->
+              </div>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              ติดตามประกาศ ข้อมูลข่าวสาร กำหนดการวัดผล และดาวน์โหลดเอกสารไฟล์แนบต่าง ๆ
+            </p>
+
+            <div id="newsFeedList" class="news-feed-list">
+              <!-- Rendered dynamically by JS (latest news at top, 5 items initially) -->
+            </div>
+
+            <!-- Load More Button Container (+5 items) -->
+            <div id="newsLoadMoreContainer" style="margin-top: 1.25rem;">
+              <!-- Rendered dynamically by JS -->
+            </div>
+          </div>
+
+          <!-- Instruction Guide Card Section -->
+          <div class="guide-card">
+            <div class="section-title">
+              <i class="fa-solid fa-compass" style="color: var(--primary);"></i>
+              <span>คำแนะนำการเข้าใช้งานระบบงานวัดผล</span>
+            </div>
+            <p style="font-size: 0.925rem; color: var(--text-muted);">
+              สำหรับครูผู้สอน นักเรียน และผู้ปกครอง สามารถเข้าใช้งานระบบต่าง ๆ ของงานวัดและประเมินผล ได้ตามขั้นตอนดังต่อไปนี้:
+            </p>
+            <div class="guide-steps-grid">
+              <div class="step-box">
+                <div class="step-number">1</div>
+                <div class="step-title">เลือกระบบงานที่ต้องการ</div>
+                <div class="step-desc">คลิกเลือกแถบเมนูระบบงานทางด้านซ้ายมือ หรือเลือกการ์ดระบบงานด้านล่าง</div>
+              </div>
+              <div class="step-box">
+                <div class="step-number">2</div>
+                <div class="step-title">เข้าสู่ระบบงานวัดผล</div>
+                <div class="step-desc">ระบบจะเปิดหน้าต่างระบบงานที่เลือกขึ้นมาแสดงผลโดยอัตโนมัติ ไม่ต้องเปิดแท็บใหม่</div>
+              </div>
+              <div class="step-box">
+                <div class="step-number">3</div>
+                <div class="step-title">บันทึก/ตรวจสอบข้อมูล</div>
+                <div class="step-desc">กรอกข้อมูลคะแนน ตรวจสอบผลการเรียน หรือส่งรายงานตามภารกิจของท่าน</div>
+              </div>
+              <div class="step-box">
+                <div class="step-number">4</div>
+                <div class="step-title">เสร็จสิ้นกระบวนการ</div>
+                <div class="step-desc">ตรวจสอบความถูกต้องและบันทึกข้อมูลก่อนปิดหน้าต่างระบบ</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Systems Catalog Section -->
+          <div id="systemSection">
+            <div class="section-title" style="justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-layer-group" style="color: var(--primary);"></i>
+                <span>ระบบงานวัดและประเมินผลทั้งหมด</span>
+              </div>
+              <div style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">
+                คลิกการ์ดเพื่อเข้าใช้งานทันที
+              </div>
+            </div>
+
+            <div class="systems-grid" id="homeSystemsGrid">
+              <!-- Rendered dynamically by JS -->
+            </div>
+          </div>
+
+          <!-- Table Overflow Summary View -->
+          <div class="guide-card" style="margin-top: 1.75rem;">
+            <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-table-list" style="color: var(--primary);"></i>
+                <span>ตารางสรุประบบสารสนเทศงานวัดผล</span>
+              </div>
+              <span class="badge badge-yellow"><i class="fa-solid fa-table"></i> Table Overflow View</span>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 70px; text-align: center;">ลำดับ</th>
+                    <th style="width: 60px; text-align: center;">ไอคอน</th>
+                    <th>ชื่อระบบงาน</th>
+                    <th>หมวดหมู่</th>
+                    <th>คำอธิบาย</th>
+                    <th style="text-align: center;">การเข้าใช้งาน</th>
+                  </tr>
+                </thead>
+                <tbody id="systemsTableBody">
+                  <!-- Rendered dynamically by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- 2. DYNAMIC EMBEDDED SYSTEM VIEW (แสดงผลระบบงานที่เลือกแบบเต็มส่วน) -->
+        <section id="view-embedded" class="page-view">
+          <div class="embedded-view-container">
+            <div class="iframe-toolbar">
+              <div class="iframe-title-group">
+                <span class="nav-icon" id="activeSystemIcon" style="width:24px; height:24px; font-size:0.75rem;"><i class="fa-solid fa-globe"></i></span>
+                <div class="iframe-title" id="activeSystemTitle">ชื่อระบบงาน</div>
+              </div>
+              <div class="iframe-controls">
+                <button class="btn btn-outline-green btn-xs" onclick="reloadIframe()" title="รีเฟรชหน้าเว็บ">
+                  <i class="fa-solid fa-rotate-right"></i> <span class="d-none-mobile">รีเฟรช</span>
+                </button>
+                <a id="btnExternalOpen" href="#" target="_blank" class="btn btn-pastel-yellow btn-xs" title="เปิดในหน้าต่างใหม่">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="d-none-mobile">เปิดในหน้าต่างใหม่</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="iframe-wrapper">
+              <div id="iframeLoader" class="iframe-loading">
+                <div class="spinner-ring"></div>
+                <div style="margin-top: 10px; font-weight: 500; color: var(--primary);">กำลังโหลดระบบงาน...</div>
+              </div>
+              <iframe id="systemIframe" class="iframe-element" src="about:blank" title="ระบบงานวัดและประเมินผล" allow="fullscreen; geolocation; microphone; camera"></iframe>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div class="footer-credits">
+        <i class="fa-solid fa-code" style="color: var(--primary);"></i>
+        <span id="footerTextDisplay">พัฒนาโดย งานวัดและประเมินผล โรงเรียนเสาไห้ "วิมลวิทยานุกูล"</span>
+      </div>
+      <div class="footer-sub">
+        © <span id="currentYear"></span> โรงเรียนเสาไห้ "วิมลวิทยานุกูล" | ระบบสารสนเทศเพื่อการศึกษา (Single Page Application)
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- 1. Admin Login Modal -->
+  <div class="modal-backdrop" id="loginModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-user-shield"></i> เข้าสู่ระบบแอดมิน (Admin Login)
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('loginModal')">&times;</button>
+      </div>
+      <form onsubmit="handleAdminLogin(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="loginUsername">ชื่อผู้ใช้งาน (Username)</label>
+            <input type="text" id="loginUsername" class="form-control" placeholder="ระบุ username" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">รหัสผ่าน (Password)</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="ระบุ password" required autocomplete="current-password">
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); background: var(--pastel-yellow); padding: 0.6rem; border-radius: var(--radius-sm); border-left: 3px solid var(--pastel-yellow-dark);">
+            <i class="fa-solid fa-circle-info"></i> เฉพาะผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น (Default: admin / admin752)
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('loginModal')">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. News Add / Edit Modal -->
+  <div class="modal-backdrop" id="newsModal">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="newsModalTitle">
+          <i class="fa-solid fa-bullhorn"></i> เพิ่มข่าวประชาสัมพันธ์ใหม่
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('newsModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveNews(event)">
+        <input type="hidden" id="newsId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="newsTitle">หัวเรื่องข่าวประชาสัมพันธ์ <span style="color:red;">*</span></label>
+            <input type="text" id="newsTitle" class="form-control" placeholder="ระบุหัวเรื่องข่าวหรือประกาศสำคัญ" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newsBadge">ป้ายกำกับประเภทข่าว</label>
+            <select id="newsBadge" class="form-control">
+              <option value="ข่าวประชาสัมพันธ์" selected>ข่าวประชาสัมพันธ์</option>
+              <option value="สำคัญมาก">สำคัญมาก</option>
+              <option value="กำหนดการวัดผล">กำหนดการวัดผล</option>
+              <option value="คู่มือและระเบียบ">คู่มือและระเบียบ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newsContent">เนื้อหาข่าว / ข้อความรายละเอียด <span style="color:red;">*</span></label>
+            <textarea id="newsContent" class="form-control" rows="4" placeholder="ระบุรายละเอียดข่าวสาร ประก่างต่าง ๆ..." required></textarea>
+          </div>
+
+          <!-- Attachments Files (File 1, File 2, File 3) -->
+          <div style="background: #f8fafc; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.15rem;">
+            <label class="form-label" style="margin-bottom: 0.65rem; color: var(--primary); font-weight: 600;">
+              <i class="fa-solid fa-paperclip"></i> ไฟล์แนบเอกสาร (ไฟล์ 1, ไฟล์ 2, ไฟล์ 3)
+            </label>
+            
+            <!-- File 1 -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <input type="text" id="file1Name" class="form-control" placeholder="ชื่อไฟล์ 1 (เช่น ตารางสอบ.pdf)">
+              <input type="url" id="file1Url" class="form-control" placeholder="URL ลิงก์ดาวน์โหลดไฟล์ 1">
+            </div>
+            <!-- File 2 -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <input type="text" id="file2Name" class="form-control" placeholder="ชื่อไฟล์ 2 (เช่น ปฏิทินวัดผล.pdf)">
+              <input type="url" id="file2Url" class="form-control" placeholder="URL ลิงก์ดาวน์โหลดไฟล์ 2">
+            </div>
+            <!-- File 3 -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem;">
+              <input type="text" id="file3Name" class="form-control" placeholder="ชื่อไฟล์ 3 (เช่น เกณฑ์การประเมิน.pdf)">
+              <input type="url" id="file3Url" class="form-control" placeholder="URL ลิงก์ดาวน์โหลดไฟล์ 3">
+            </div>
+          </div>
+
+          <!-- Multi-Image Uploads & Gallery -->
+          <div style="background: #f8fafc; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <label class="form-label" style="margin-bottom: 0.65rem; color: var(--primary); font-weight: 600;">
+              <i class="fa-solid fa-images"></i> รูปภาพประกอบข่าว (สามารถใส่ได้หลายรูปภาพ)
+            </label>
+            
+            <div style="margin-bottom: 0.75rem;">
+              <label class="form-label" style="font-size: 0.8rem; color: var(--text-muted);">เลือกไฟล์รูปภาพจากอุปกรณ์:</label>
+              <input type="file" id="newsImageFileInput" class="form-control" accept="image/*" multiple onchange="handleNewsImageFilesUpload(event)">
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.85rem;">
+              <input type="url" id="newsImageUrlInput" class="form-control" placeholder="หรือ เพิ่มด้วย URL รูปภาพ (https://...)">
+              <button type="button" class="btn btn-outline-green btn-sm" onclick="addNewsImageUrl()"><i class="fa-solid fa-plus"></i> เพิ่ม URL</button>
+            </div>
+
+            <div id="newsModalImagesPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.65rem;">
+              <!-- Rendered image thumbnails with remove button -->
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('newsModal')">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกข่าวประชาสัมพันธ์
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Image Viewer Lightbox Modal -->
+  <div class="modal-backdrop" id="imageViewerModal">
+    <div class="modal-box" style="max-width: 820px; background: transparent; box-shadow: none; border: none; padding: 0;">
+      <div style="position: relative; text-align: center;">
+        <button class="modal-close-btn" onclick="closeModal('imageViewerModal')" style="position: absolute; top: -15px; right: -15px; background: #ffffff; color: #000; box-shadow: var(--shadow-md); z-index: 10;">&times;</button>
+        <img id="viewerModalImg" src="" alt="Full view" style="max-width: 100%; max-height: 80vh; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); object-fit: contain; background: #ffffff;">
+        <div id="viewerModalCaption" style="margin-top: 0.75rem; color: #ffffff; font-size: 0.95rem; font-weight: 500; background: rgba(0,0,0,0.7); padding: 0.5rem 1.25rem; border-radius: var(--radius-full); display: inline-block;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. System Add/Edit Modal -->
+  <div class="modal-backdrop" id="systemModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="systemModalTitle">
+          <i class="fa-solid fa-plus-circle"></i> เพิ่มระบบงานใหม่
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('systemModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveSystem(event)">
+        <input type="hidden" id="sysId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="sysTitle">ชื่อระบบงาน <span style="color:red;">*</span></label>
+            <input type="text" id="sysTitle" class="form-control" placeholder="เช่น ระบบบันทึกคะแนนสอบกลางภาค" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sysUrl">URL เว็บไซต์ระบบงาน <span style="color:red;">*</span></label>
+            <input type="url" id="sysUrl" class="form-control" placeholder="https://example.com หรือลิงก์ Google Form/Sheet" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sysCategory">หมวดหมู่ระบบงาน</label>
+            <input type="text" id="sysCategory" class="form-control" placeholder="เช่น งานวัดผล, ตรวจสอบคะแนน, เอกสาร ปพ.">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sysDesc">คำอธิบายระบบงานย่อ</label>
+            <textarea id="sysDesc" class="form-control" rows="2" placeholder="รายละเอียดหรือคำแนะนำสั้น ๆ สำหรับการใช้งานระบบนี้"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ไอคอนสัญลักษณ์</label>
+            <input type="hidden" id="sysIcon" value="fa-solid fa-globe">
+            <div class="icon-selector-grid" id="iconPickerGrid">
+              <div class="icon-option selected" data-icon="fa-solid fa-globe" onclick="selectIcon('fa-solid fa-globe')"><i class="fa-solid fa-globe"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-file-signature" onclick="selectIcon('fa-solid fa-file-signature')"><i class="fa-solid fa-file-signature"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-user-graduate" onclick="selectIcon('fa-solid fa-user-graduate')"><i class="fa-solid fa-user-graduate"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-certificate" onclick="selectIcon('fa-solid fa-certificate')"><i class="fa-solid fa-certificate"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-clipboard-check" onclick="selectIcon('fa-solid fa-clipboard-check')"><i class="fa-solid fa-clipboard-check"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-calendar-days" onclick="selectIcon('fa-solid fa-calendar-days')"><i class="fa-solid fa-calendar-days"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-chart-line" onclick="selectIcon('fa-solid fa-chart-line')"><i class="fa-solid fa-chart-line"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-book-bookmark" onclick="selectIcon('fa-solid fa-book-bookmark')"><i class="fa-solid fa-book-bookmark"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-school" onclick="selectIcon('fa-solid fa-school')"><i class="fa-solid fa-school"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-sliders" onclick="selectIcon('fa-solid fa-sliders')"><i class="fa-solid fa-sliders"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-cloud-arrow-up" onclick="selectIcon('fa-solid fa-cloud-arrow-up')"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              <div class="icon-option" data-icon="fa-solid fa-graduation-cap" onclick="selectIcon('fa-solid fa-graduation-cap')"><i class="fa-solid fa-graduation-cap"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('systemModal')">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. User Guide Modal -->
+  <div class="modal-backdrop" id="guideModal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-circle-question"></i> คู่มือการใช้งานระบบสารสนเทศงานวัดผล
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('guideModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="color: var(--primary); font-size: 1.05rem; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-check-circle"></i> คำแนะนำสำหรับการเข้าใช้งานระบบงานวัดผล
+        </h4>
+        <ul style="padding-left: 1.25rem; margin-bottom: 1.25rem; font-size: 0.925rem; color: var(--text-dark);">
+          <li style="margin-bottom: 0.5rem;">
+            <strong>การเลือกเข้าใช้งานระบบ:</strong> สามารถคลิกที่ชื่อระบบงานจากเมนูด้านซ้ายมือ หรือคลิกปุ่มเข้าใช้งานบนการ์ดระบบหน้าแรก
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            <strong>การแสดงผลแบบบูรณาการ (Single Page):</strong> ระบบจะแสดงผลเว็บไซต์งานวัดผลให้อยู่ภายในหน้าต่างหลักทันทีโดยไม่ต้องเปิดแท็บเบราว์เซอร์ใหม่
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            <strong>การรีโหลดและการเปิดแท็บใหม่:</strong> หากต้องการโหลดหน้าเว็บใหม่อีกครั้งให้กดปุ่ม <span class="badge badge-green"><i class="fa-solid fa-rotate-right"></i> รีโหลด</span> หรือหากต้องการเปิดในหน้าต่างแยกให้กดปุ่ม <span class="badge badge-yellow"><i class="fa-solid fa-arrow-up-right-from-square"></i> เปิดแท็บใหม่</span>
+          </li>
+          <li>
+            <strong>การใช้งานบนอุปกรณ์เคลื่อนที่:</strong> สำหรับโทรศัพท์มือถือหรือแท็บเล็ต ให้กดปุ่มเมนูสามขีด (<i class="fa-solid fa-bars"></i>) มุมบนขวาเพื่อเปิด-ปิดแถบเมนูระบบงาน
+          </li>
+        </ul>
+
+        <div style="background: var(--pastel-green-light); padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary-green);">
+          <strong style="color: var(--primary); font-size: 0.95rem;">
+            <i class="fa-solid fa-headset"></i> ต้องการความช่วยเหลือเพิ่มเติม?
+          </strong>
+          <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">
+            หากพบปัญหากรณีลิงก์ระบบงานไม่แสดงผล หรือต้องการสอบถามเรื่องการวัดและประเมินผล ติดต่อได้ที่กลุ่มงานวัดและประเมินผลการศึกษา โรงเรียนเสาไห้ "วิมลวิทยานุกูล"
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeModal('guideModal')">รับทราบ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Change Logo Modal -->
+  <div class="modal-backdrop" id="logoModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-image"></i> อัปโหลด / เปลี่ยนรูปโลโก้โรงเรียน
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('logoModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveLogo(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">เลือกอัปโหลดไฟล์รูปภาพโลโก้ใหม่</label>
+            <input type="file" id="logoFileInput" class="form-control" accept="image/*" onchange="previewLogoFile(event)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">หรือ ระบุ URL ของรูปภาพโลโก้</label>
+            <input type="url" id="logoUrlInput" class="form-control" placeholder="https://example.com/logo.png" oninput="previewLogoUrl(this.value)">
+          </div>
+          <div class="form-group text-center">
+            <label class="form-label">ตัวอย่างแสดงผลโลโก้ปัจจุบัน</label>
+            <div style="background: var(--pastel-green-light); padding: 1rem; border-radius: var(--radius-md); display: inline-block;">
+              <img id="logoPreviewImg" src="" alt="Preview Logo" style="height: 60px; max-width: 220px; object-fit: contain;">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="resetDefaultLogo()">คืนค่าโลโก้เริ่มต้น</button>
+          <button type="button" class="btn btn-ghost" onclick="closeModal('logoModal')">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกโลโก้
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Change Footer Modal -->
+  <div class="modal-backdrop" id="footerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-pen-to-square"></i> แก้ไขข้อความท้ายเว็บไซต์ (Footer Credits)
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('footerModal')">&times;</button>
+      </div>
+      <form onsubmit="handleSaveFooter(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="footerTextInput">ข้อความพัฒนาโดย...</label>
+            <input type="text" id="footerTextInput" class="form-control" placeholder="เช่น พัฒนาโดย งานวัดและประเมินผล โรงเรียนเสาไห้ วิมลวิทยานุกูล" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal('footerModal')">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อความ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Theme Color & Dark Mode Modal -->
+  <div class="modal-backdrop" id="themeModal">
+    <div class="modal-box" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <i class="fa-solid fa-palette"></i> ปรับแต่งโทนสีและโหมดการแสดงผล
+        </h3>
+        <button class="modal-close-btn" onclick="closeModal('themeModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Section 1: Dark Mode Toggle -->
+        <div style="background: var(--pastel-green-light); padding: 1.15rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1.35rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <div style="font-weight: 600; color: var(--text-dark); font-size: 1rem;">
+              <i class="fa-solid fa-moon"></i> โหมดการแสดงผล (Theme Mode)
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              สลับระหว่างโหมดสว่าง (Light Mode) และโหมดมืด (Dark Mode)
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="toggleDarkMode()">
+            <span id="themeModalToggleText">สลับเป็นโหมดมืด</span>
+          </button>
+        </div>
+
+        <!-- Section 2: Preset Color Palettes -->
+        <div class="form-group">
+          <label class="form-label" style="font-size: 1rem; font-weight: 600; color: var(--primary);">
+            <i class="fa-solid fa-swatchbook"></i> เลือกโทนสีที่ต้องการ (Color Presets)
+          </label>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            คลิกเลือกชุดโทนสีพาสเทลยอดนิยมเพื่อปรับเปลี่ยนสีของระบบทันที:
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+            <!-- Green Preset -->
+            <div class="theme-palette-card" onclick="applyThemePreset('green')" data-preset="green" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; transition: var(--transition); background: #ffffff;">
+              <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 0.4rem;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #2e7d32; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #66bb6a; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #fff9c4; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">🌿 เขียวพาสเทล</div>
+              <div style="font-size: 0.75rem; color: #64748b;">(ดั้งเดิม / ธรรมชาติ)</div>
+            </div>
+
+            <!-- Blue Preset -->
+            <div class="theme-palette-card" onclick="applyThemePreset('blue')" data-preset="blue" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; transition: var(--transition); background: #ffffff;">
+              <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 0.4rem;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #1565c0; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #42a5f5; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #e3f2fd; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">🌊 ฟ้าพาสเทล</div>
+              <div style="font-size: 0.75rem; color: #64748b;">(สดใส / ท้องฟ้า)</div>
+            </div>
+
+            <!-- Pink Preset -->
+            <div class="theme-palette-card" onclick="applyThemePreset('pink')" data-preset="pink" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; transition: var(--transition); background: #ffffff;">
+              <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 0.4rem;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #c2185b; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #ec407a; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #fce4ec; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">🌸 ชมพูพาสเทล</div>
+              <div style="font-size: 0.75rem; color: #64748b;">(อ่อนหวาน / ซากุระ)</div>
+            </div>
+
+            <!-- Purple Preset -->
+            <div class="theme-palette-card" onclick="applyThemePreset('purple')" data-preset="purple" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; transition: var(--transition); background: #ffffff;">
+              <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 0.4rem;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #6a1b9a; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #ab47bc; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #f3e5f5; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">💜 ม่วงลาเวนเดอร์</div>
+              <div style="font-size: 0.75rem; color: #64748b;">(สง่างาม / ลาเวนเดอร์)</div>
+            </div>
+
+            <!-- Amber Preset -->
+            <div class="theme-palette-card" onclick="applyThemePreset('amber')" data-preset="amber" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; transition: var(--transition); background: #ffffff;">
+              <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 0.4rem;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #d97706; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #fef3c7; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">🍊 ส้มพีชพาสเทล</div>
+              <div style="font-size: 0.75rem; color: #64748b;">(อบอุ่น / แสงอาทิตย์)</div>
+            </div>
+
+            <!-- Teal Preset -->
+            <div class="theme-palette-card" onclick="applyThemePreset('teal')" data-preset="teal" style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; transition: var(--transition); background: #ffffff;">
+              <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 0.4rem;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #00695c; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #26a69a; display: inline-block;"></span>
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: #e0f2f1; display: inline-block;"></span>
+              </div>
+              <div style="font-size: 0.875rem; font-weight: 600; color: #1e293b;">🌲 เทอร์ควอยซ์</div>
+              <div style="font-size: 0.75rem; color: #64748b;">(มรกต / ทะเลลึก)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Custom Primary Color Picker -->
+        <div style="background: #f8fafc; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-top: 1rem;">
+          <label class="form-label" style="font-weight: 600; color: var(--text-dark); display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fa-solid fa-eye-dropper"></i> กำหนดสีหลักด้วยตนเอง (Custom Color):</span>
+            <input type="color" id="customThemeColorInput" value="#2e7d32" onchange="applyCustomThemeColor(this.value)" style="border: 1px solid var(--border-color); border-radius: 6px; width: 38px; height: 38px; cursor: pointer; padding: 2px; background: #ffffff;">
+          </label>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">
+            เลือกสีที่ท่านต้องการ แล้วระบบจะปรับแต่งชุดสีและไฮไลต์ที่เกี่ยวข้องโดยอัตโนมัติ
+          </span>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeModal('themeModal')">ตกลง / บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // --- DEFAULT DATA & CONSTANTS ---
+    const DEFAULT_GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZSlWG6BIFF59vFP4ao2W3NAZ_trZ1xPgMwMQNuOocRz7O2-lO1kVIW9AUw8uMiylz/exec";
+    const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200"><circle cx="100" cy="100" r="90" fill="%23e8f5e9" stroke="%232e7d32" stroke-width="8"/><circle cx="100" cy="100" r="75" fill="%23ffffff" stroke="%23fbc02d" stroke-width="4"/><path d="M100 35 L120 75 L165 75 L130 100 L145 145 L100 118 L55 145 L70 100 L35 75 L80 75 Z" fill="%2366bb6a" stroke="%232e7d32" stroke-width="3"/><text x="100" y="172" font-family="sans-serif" font-size="16" font-weight="bold" fill="%232e7d32" text-anchor="middle">WIMON EVAL</text></svg>`;
+
+    const DEFAULT_NEWS = [
+      {
+        id: "news_1700000000007",
+        title: "ประกาศกำหนดการวัดและประเมินผลการเรียนรู้ ประจำภาคเรียนที่ 2 ปีการศึกษา 2568",
+        badge: "สำคัญมาก",
+        date: "2026-09-24",
+        content: "งานวัดและประเมินผลการศึกษา โรงเรียนเสาไห้ \"วิมลวิทยานุกูล\" ขอแจ้งกำหนดการส่งผลการเรียนกลางภาคและปลายภาคเรียน ประจำภาคเรียนที่ 2 ปีการศึกษา 2568 ขอให้คณะครูผู้สอนทุกท่านดำเนินการจัดทำคะแนนและส่งตามกำหนดเวลา โดยสามารถดาวน์โหลดเอกสารคู่มือและเกณฑ์การประเมินได้จากไฟล์แนบด้านล่าง",
+        files: [
+          { name: "ไฟล์ 1: ปฏิทินกำหนดการวัดผล 2568.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+          { name: "ไฟล์ 2: คู่มือการบันทึกคะแนนครูผู้สอน.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+          { name: "ไฟล์ 3: ระเบียบวัดและประเมินผลโรงเรียน.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80"
+        ]
+      },
+      {
+        id: "news_1700000000006",
+        title: "เปิดระบบตรวจสอบผลการเรียนรายบุคคลและตารางสอบซ่อมเสริม",
+        badge: "ข่าวประชาสัมพันธ์",
+        date: "2026-09-20",
+        content: "นักเรียนและผู้ปกครองสามารถเข้าตรวจสอบผลการเรียนรายวิชา คะแนนสอบ และกำหนดการลงทะเบียนสอบซ่อมเสริมผ่านระบบสารสนเทศงานวัดผลได้แล้ววันนี้ โดยคลิกเลือกเมนูด้านซ้ายมือ \"ระบบตรวจสอบผลการเรียนรายบุคคล\"",
+        files: [
+          { name: "ไฟล์ 1: ตารางสอบซ่อมเสริม.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+          { name: "ไฟล์ 2: คำร้องขอสอบซ่อมเสริม.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80"
+        ]
+      },
+      {
+        id: "news_1700000000005",
+        title: "การจัดส่งแบบรายงานผลการเรียนรายวิชา (ปพ.5) และบันทึกคะแนนสะสม",
+        badge: "คู่มือและระเบียบ",
+        date: "2026-09-15",
+        content: "ขอให้คุณครูผู้สอนทุกกลุ่มสาระการเรียนรู้ ดำเนินการอนุมัติและจัดส่งเอกสาร ปพ.5 ผ่านระบบสารสนเทศงานวัดผลภายในวันที่ 30 กันยายนนี้ เพื่อให้งานวัดผลสามารถประมวลผลการเรียนและสรุปผลการอนุมัติการจบการศึกษาได้ตามปฏิทินปฏิบัติงาน",
+        files: [
+          { name: "ไฟล์ 1: คู่มือการจัดส่งเอกสาร ปพ.5.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ],
+        images: []
+      },
+      {
+        id: "news_1700000000004",
+        title: "แจ้งกำหนดการลงทะเบียนซ่อมเสริมผลการเรียนติด 0, ร, มส (รอบที่ 1)",
+        badge: "กำหนดการวัดผล",
+        date: "2026-09-10",
+        content: "สำหรับนักเรียนที่มีผลการเรียน 0, ร, มส ในภาคเรียนที่ผ่านมา สามารถยื่นคำร้องขอสอบซ่อมเสริมและยื่นชิ้นงานแก้ไขผลการเรียนได้ที่ห้องกลุ่มงานวัดและประเมินผลการศึกษา หรือติดต่อครูผู้สอนประจำวิชา",
+        files: [
+          { name: "ไฟล์ 1: แบบคำร้องขอซ่อมเสริม.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80"
+        ]
+      },
+      {
+        id: "news_1700000000003",
+        title: "แนวทางการประเมินคุณลักษณะอันพึงประสงค์และการอ่าน คิดวิเคราะห์",
+        badge: "คู่มือและระเบียบ",
+        date: "2026-09-05",
+        content: "งานวัดและประเมินผลได้ปรับปรุงแบบประเมินคุณลักษณะอันพึงประสงค์ 8 ประการ และเกณฑ์การอ่าน คิดวิเคราะห์ และเขียน ผ่านระบบออนไลน์ ขอให้ครูปรึกษาดำเนินการประเมินนักเรียนในปกครองตามกำหนดเวลา",
+        files: [
+          { name: "ไฟล์ 1: เกณฑ์การประเมิน 8 ประการ.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ],
+        images: []
+      },
+      {
+        id: "news_1700000000002",
+        title: "ประกาศปฏิทินตารางสอบกลางภาคเรียน ประจำปีการศึกษา 2568",
+        badge: "กำหนดการวัดผล",
+        date: "2026-08-28",
+        content: "ขอให้นักเรียนทุกคนตรวจสอบตารางสอบกลางภาค เลขที่นั่งสอบ และห้องสอบรายวิชาผ่านตารางสรุปในระบบสารสนเทศงานวัดผล",
+        files: [
+          { name: "ไฟล์ 1: ตารางสอบกลางภาค.pdf", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ],
+        images: []
+      },
+      {
+        id: "news_1700000000001",
+        title: "ยินดีต้อนรับสู่ระบบสารสนเทศงานวัดและประเมินผล โรงเรียนเสาไห้ \"วิมลวิทยานุกูล\"",
+        badge: "ข่าวประชาสัมพันธ์",
+        date: "2026-08-15",
+        content: "เปิดใช้งานระบบสารสนเทศรูปแบบ Single Page Application เพื่อเพิ่มความสะดวกในการบันทึกข้อมูลคะแนน ตรวจสอบผลการเรียน และดาวน์โหลดเอกสารงานวัดผลอย่างเป็นทางการ",
+        files: [],
+        images: []
+      }
+    ];
+
+    const DEFAULT_SYSTEMS = [
+      {
+        id: "sys_1",
+        title: "ระบบบันทึกผลการเรียน (GPA/คะแนน)",
+        url: "https://docs.google.com/spreadsheets",
+        icon: "fa-solid fa-file-signature",
+        category: "การวัดผล",
+        desc: "สำหรับครูผู้สอนบันทึกคะแนนเก็บและคะแนนสอบประมวลผลการเรียนรายวิชา"
+      },
+      {
+        id: "sys_2",
+        title: "ระบบตรวจสอบผลการเรียนรายบุคคล",
+        url: "https://forms.google.com",
+        icon: "fa-solid fa-user-graduate",
+        category: "นักเรียน/ผู้ปกครอง",
+        desc: "สำหรับนักเรียนและผู้ปกครองตรวจสอบผลการเรียน ผลการสอบ และผลการเรียนซ่อมเสริม"
+      },
+      {
+        id: "sys_3",
+        title: "ระบบอนุมัติการจบการศึกษา (ปพ.1 / ปพ.3)",
+        url: "https://drive.google.com",
+        icon: "fa-solid fa-certificate",
+        category: "นายทะเบียน",
+        desc: "ระบบการจัดทำ ตรวจสอบ และอนุมัติเอกสารหลักฐานการศึกษา ปพ.1, ปพ.3 และ ปพ.7"
+      },
+      {
+        id: "sys_4",
+        title: "ระบบประเมินคุณลักษณะ & อ่านคิดวิเคราะห์",
+        url: "https://sites.google.com",
+        icon: "fa-solid fa-clipboard-check",
+        category: "ประเมินผล",
+        desc: "บันทึกผลการประเมินคุณลักษณะอันพึงประสงค์ 8 ประการ และความสามารถในการอ่าน คิดวิเคราะห์"
+      },
+      {
+        id: "sys_5",
+        title: "ตารางสอบและกำหนดการวัดผล",
+        url: "https://calendar.google.com",
+        icon: "fa-solid fa-calendar-days",
+        category: "กำหนดการ",
+        desc: "ปฏิทินงานวัดผล กำหนดการส่งคะแนน และตารางสอบกลางภาค / ปลายภาค"
+      }
+    ];
+
+    const DEFAULT_FOOTER = "พัฒนาโดย งานวัดและประเมินผล โรงเรียนเสาไห้ \"วิมลวิทยานุกูล\"";
+
+    // --- APPLICATION STATE ---
+    let appState = {
+      isAdmin: false,
+      news: [],
+      systems: [],
+      logoUrl: "",
+      footerText: "",
+      activeTab: "home", // "home" or system id
+      newsVisibleCount: 5, // Initially show 5 news items!
+      tempNewsImages: [] // transient modal news images
+    };
+
+    // --- INITIALIZATION ---
+    document.addEventListener("DOMContentLoaded", function() {
+      showGlobalLoader("กำลังโหลดระบบสารสนเทศ...");
+      
+      // Load data from localStorage
+      loadLocalStorageData();
+      
+      // Update Footer Current Year (Buddhist Era)
+      document.getElementById("currentYear").textContent = new Date().getFullYear() + 543;
+      
+      // Render Initial UI
+      renderHeaderLogo();
+      renderAuthNav();
+      renderNewsFeed();
+      renderSidebarMenu();
+      renderTopScrollTabs();
+      renderHomeGrid();
+      renderFooterText();
+      
+      hideGlobalLoader();
+    });
+
+    // --- LOCAL STORAGE MANAGER ---
+    function loadLocalStorageData() {
+      // News
+      const savedNews = localStorage.getItem("wimon_news");
+      if (savedNews) {
+        try {
+          appState.news = JSON.parse(savedNews);
+        } catch(e) {
+          appState.news = DEFAULT_NEWS;
+        }
+      } else {
+        appState.news = DEFAULT_NEWS;
+        localStorage.setItem("wimon_news", JSON.stringify(DEFAULT_NEWS));
+      }
+
+      // Systems
+      const savedSystems = localStorage.getItem("wimon_systems");
+      if (savedSystems) {
+        try {
+          appState.systems = JSON.parse(savedSystems);
+        } catch(e) {
+          appState.systems = DEFAULT_SYSTEMS;
+        }
+      } else {
+        appState.systems = DEFAULT_SYSTEMS;
+        localStorage.setItem("wimon_systems", JSON.stringify(DEFAULT_SYSTEMS));
+      }
+
+      // Logo
+      const savedLogo = localStorage.getItem("wimon_logo");
+      appState.logoUrl = savedLogo || DEFAULT_LOGO_SVG;
+
+      // Footer Text
+      const savedFooter = localStorage.getItem("wimon_footer");
+      appState.footerText = savedFooter || DEFAULT_FOOTER;
+
+      // Admin Login Session Status
+      const savedAdmin = localStorage.getItem("wimon_admin_logged");
+      appState.isAdmin = savedAdmin === "true";
+
+      // Dark Mode Status
+      const savedDark = localStorage.getItem("wimon_dark_mode");
+      if (savedDark === "true") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        updateThemeUIControls(true);
+      } else {
+        updateThemeUIControls(false);
+      }
+
+      // Theme Preset / Custom Color Status
+      const savedPreset = localStorage.getItem("wimon_theme_preset") || "green";
+      if (savedPreset === "custom") {
+        const savedCustomHex = localStorage.getItem("wimon_custom_color") || "#2e7d32";
+        applyCustomThemeColor(savedCustomHex, true);
+        const colorInput = document.getElementById("customThemeColorInput");
+        if (colorInput) colorInput.value = savedCustomHex;
+      } else {
+        applyThemePreset(savedPreset, true);
+      }
+    }
+
+    // --- THEMES & DARK MODE MANAGERS ---
+    const THEME_PRESETS = {
+      green: {
+        primary: "#2e7d32",
+        primaryGreen: "#66bb6a",
+        light: "#e8f5e9",
+        hover: "#c8e6c9"
+      },
+      blue: {
+        primary: "#1565c0",
+        primaryGreen: "#42a5f5",
+        light: "#e3f2fd",
+        hover: "#bbdefb"
+      },
+      pink: {
+        primary: "#c2185b",
+        primaryGreen: "#ec407a",
+        light: "#fce4ec",
+        hover: "#f8bbd0"
+      },
+      purple: {
+        primary: "#6a1b9a",
+        primaryGreen: "#ab47bc",
+        light: "#f3e5f5",
+        hover: "#e1bee7"
+      },
+      amber: {
+        primary: "#d97706",
+        primaryGreen: "#f59e0b",
+        light: "#fef3c7",
+        hover: "#fde68a"
+      },
+      teal: {
+        primary: "#00695c",
+        primaryGreen: "#26a69a",
+        light: "#e0f2f1",
+        hover: "#b2dfdb"
+      }
+    };
+
+    function toggleDarkMode() {
+      if (!appState.isAdmin) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'เฉพาะผู้ดูแลระบบ (Admin)',
+          text: 'สิทธิ์การปรับแต่งโหมดมืด/สว่าง ถูกสงวนไว้สำหรับผู้ดูแลระบบเท่านั้น',
+          confirmButtonColor: '#2e7d32',
+          confirmButtonText: 'ตกลง'
+        });
+        return;
+      }
+      const htmlEl = document.documentElement;
+      const isDark = htmlEl.getAttribute("data-theme") === "dark";
+      const newDarkState = !isDark;
+
+      if (newDarkState) {
+        htmlEl.setAttribute("data-theme", "dark");
+        localStorage.setItem("wimon_dark_mode", "true");
+        showToast("info", "เปลี่ยนเป็นโหมดมืด (Dark Mode)");
+      } else {
+        htmlEl.removeAttribute("data-theme");
+        localStorage.setItem("wimon_dark_mode", "false");
+        showToast("info", "เปลี่ยนเป็นโหมดสว่าง (Light Mode)");
+      }
+      updateThemeUIControls(newDarkState);
+    }
+
+    function updateThemeUIControls(isDark) {
+      const btnText = document.getElementById("themeToggleText");
+      const btnIcon = document.querySelector("#btnThemeToggle i");
+      const modalText = document.getElementById("themeModalToggleText");
+
+      if (isDark) {
+        if (btnText) btnText.textContent = "โหมดสว่าง";
+        if (btnIcon) btnIcon.className = "fa-solid fa-sun";
+        if (modalText) modalText.textContent = "สลับเป็นโหมดสว่าง (Light Mode)";
+      } else {
+        if (btnText) btnText.textContent = "โหมดมืด";
+        if (btnIcon) btnIcon.className = "fa-solid fa-moon";
+        if (modalText) modalText.textContent = "สลับเป็นโหมดมืด (Dark Mode)";
+      }
+    }
+
+    function applyThemePreset(presetKey, isInit = false) {
+      if (!isInit && !appState.isAdmin) return;
+      const preset = THEME_PRESETS[presetKey] || THEME_PRESETS.green;
+      appState.currentTheme = presetKey;
+      if (!isInit || appState.isAdmin) {
+        localStorage.setItem("wimon_theme_preset", presetKey);
+      }
+
+      setThemeCSSVariables(preset.primary, preset.primaryGreen, preset.light, preset.hover);
+      highlightSelectedThemeCard(presetKey);
+    }
+
+    function applyCustomThemeColor(hexColor, isInit = false) {
+      if (!hexColor) return;
+      if (!isInit && !appState.isAdmin) return;
+      appState.currentTheme = "custom";
+      if (!isInit || appState.isAdmin) {
+        localStorage.setItem("wimon_theme_preset", "custom");
+        localStorage.setItem("wimon_custom_color", hexColor);
+      }
+
+      const lightTint = hexToLightTint(hexColor);
+      setThemeCSSVariables(hexColor, hexColor, lightTint, lightTint);
+      highlightSelectedThemeCard("custom");
+    }
+
+    function setThemeCSSVariables(primary, primaryGreen, light, hover) {
+      const root = document.documentElement;
+      root.style.setProperty("--primary", primary);
+      root.style.setProperty("--primary-green", primaryGreen);
+      root.style.setProperty("--pastel-green-light", light);
+      root.style.setProperty("--pastel-green-hover", hover);
+    }
+
+    function highlightSelectedThemeCard(presetKey) {
+      const cards = document.querySelectorAll(".theme-palette-card");
+      cards.forEach(card => {
+        if (card.getAttribute("data-preset") === presetKey) {
+          card.style.borderColor = "var(--primary)";
+          card.style.boxShadow = "0 0 0 3px rgba(102, 187, 106, 0.4)";
+        } else {
+          card.style.borderColor = "var(--border-color)";
+          card.style.boxShadow = "none";
+        }
+      });
+    }
+
+    function hexToLightTint(hex) {
+      let c = hex.replace("#", "");
+      if (c.length === 3) c = c.split("").map(x => x + x).join("");
+      const r = parseInt(c.substring(0, 2), 16);
+      const g = parseInt(c.substring(2, 4), 16);
+      const b = parseInt(c.substring(4, 6), 16);
+      const lr = Math.round(r * 0.12 + 255 * 0.88);
+      const lg = Math.round(g * 0.12 + 255 * 0.88);
+      const lb = Math.round(b * 0.12 + 255 * 0.88);
+      return `rgb(${lr}, ${lg}, ${lb})`;
+    }
+
+    function saveNewsToStorage() {
+      localStorage.setItem("wimon_news", JSON.stringify(appState.news));
+    }
+
+    function saveSystemsToStorage() {
+      localStorage.setItem("wimon_systems", JSON.stringify(appState.systems));
+    }
+
+    // --- TOAST NOTIFICATION UTILITY ---
+    function showToast(icon, title) {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
+      Toast.fire({
+        icon: icon, // 'success', 'error', 'warning', 'info'
+        title: title
+      });
+    }
+
+    // --- GLOBAL LOADER SPINNER ---
+    function showGlobalLoader(msg = "กำลังดำเนินการ...") {
+      document.getElementById("loaderMessage").textContent = msg;
+      document.getElementById("globalLoader").classList.remove("hidden");
+    }
+
+    function hideGlobalLoader() {
+      document.getElementById("globalLoader").classList.add("hidden");
+    }
+
+    // --- AUTHENTICATION SYSTEM (ADMIN) ---
+    function renderAuthNav() {
+      const container = document.getElementById("authNavContainer");
+      const adminFooter = document.getElementById("adminSidebarFooter");
+      const adminThemeHeader = document.getElementById("adminThemeHeaderContainer");
+
+      if (appState.isAdmin) {
+        container.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="badge badge-admin"><i class="fa-solid fa-user-shield"></i> ผู้ดูแลระบบ</span>
+            <button class="btn btn-danger btn-sm" onclick="handleAdminLogout()" title="ออกจากระบบ">
+              <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+            </button>
+          </div>
+        `;
+        if (adminFooter) adminFooter.style.display = "block";
+        if (adminThemeHeader) adminThemeHeader.style.display = "flex";
+      } else {
+        container.innerHTML = `
+          <button class="btn btn-pastel-yellow btn-sm" onclick="openModal('loginModal')">
+            <i class="fa-solid fa-key"></i> เข้าสู่ระบบ (Admin)
+          </button>
+        `;
+        if (adminFooter) adminFooter.style.display = "none";
+        if (adminThemeHeader) adminThemeHeader.style.display = "none";
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById("loginUsername").value.trim();
+      const pass = document.getElementById("loginPassword").value.trim();
+
+      if (user === "admin" && pass === "admin752") {
+        appState.isAdmin = true;
+        localStorage.setItem("wimon_admin_logged", "true");
+        closeModal("loginModal");
+        renderAuthNav();
+        renderNewsFeed();
+        renderSidebarMenu();
+        renderHomeGrid();
+        showToast("success", "เข้าสู่ระบบแอดมินสำเร็จ");
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'เข้าสู่ระบบไม่สำเร็จ',
+          text: 'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง! (Default: admin / admin752)',
+          confirmButtonColor: '#2e7d32',
+          confirmButtonText: 'ตกลง'
+        });
+      }
+    }
+
+    function handleAdminLogout() {
+      Swal.fire({
+        title: 'ยืนยันการออกจากระบบ?',
+        text: 'คุณต้องการออกจากสิทธิ์การใช้งานผู้ดูแลระบบใช่หรือไม่',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ใช่, ออกจากระบบ',
+        cancelButtonText: 'ยกเลิก'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          appState.isAdmin = false;
+          localStorage.removeItem("wimon_admin_logged");
+          renderAuthNav();
+          renderNewsFeed();
+          renderSidebarMenu();
+          renderHomeGrid();
+          showToast("info", "ออกจากระบบเรียบร้อยแล้ว");
+        }
+      });
+    }
+
+    // --- NEWS PR FEED MANAGEMENT (ข่าวล่าสุดอยู่ข้างบน แสดงทีละ 5 อัน) ---
+    function renderNewsFeed() {
+      const feedList = document.getElementById("newsFeedList");
+      const newsBadgeCount = document.getElementById("newsCountBadge");
+      const adminNewsTopBtn = document.getElementById("adminNewsBtnTop");
+      const loadMoreContainer = document.getElementById("newsLoadMoreContainer");
+
+      const totalNews = appState.news.length;
+      newsBadgeCount.textContent = `${totalNews} ข่าว`;
+
+      if (appState.isAdmin) {
+        adminNewsTopBtn.innerHTML = `
+          <button class="btn btn-pastel-yellow btn-sm" onclick="openAddNewsModal()">
+            <i class="fa-solid fa-plus-circle"></i> เพิ่มข่าวประชาสัมพันธ์
+          </button>
+        `;
+      } else {
+        adminNewsTopBtn.innerHTML = '';
+      }
+
+      if (!appState.news || totalNews === 0) {
+        feedList.innerHTML = `
+          <div style="text-align: center; padding: 2.5rem; background: #ffffff; border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+            <i class="fa-solid fa-bullhorn" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 0.75rem;"></i>
+            <p style="color: var(--text-muted);">ยังไม่มีรายการข่าวประชาสัมพันธ์ในขณะนี้</p>
+            ${appState.isAdmin ? `<button class="btn btn-primary btn-sm" style="margin-top: 0.75rem;" onclick="openAddNewsModal()"><i class="fa-solid fa-plus"></i> เพิ่มข่าวแรกเลย</button>` : ''}
+          </div>
+        `;
+        if (loadMoreContainer) loadMoreContainer.innerHTML = '';
+        return;
+      }
+
+      // Ensure latest news is on top (sorted by id descending)
+      const sortedNews = [...appState.news].sort((a, b) => (b.id > a.id ? 1 : -1));
+
+      // Slice to display only newsVisibleCount (5 items initially)
+      const visibleNews = sortedNews.slice(0, appState.newsVisibleCount);
+
+      let html = '';
+      visibleNews.forEach((news) => {
+        // Files HTML
+        let filesHtml = '';
+        if (news.files && news.files.length > 0) {
+          const validFiles = news.files.filter(f => f && f.url && f.url.trim() !== '');
+          if (validFiles.length > 0) {
+            let fileBtns = '';
+            validFiles.forEach((file, idx) => {
+              fileBtns += `
+                <a href="${escapeHtml(file.url)}" target="_blank" class="news-file-btn">
+                  <i class="fa-solid fa-file-pdf"></i> ${escapeHtml(file.name || `ไฟล์ ${idx+1}`)}
+                </a>
+              `;
+            });
+            filesHtml = `
+              <div class="news-files-box">
+                <div class="news-files-title">
+                  <i class="fa-solid fa-paperclip"></i> เอกสารประกอบข่าวประชาสัมพันธ์ / ไฟล์แนบ:
+                </div>
+                <div class="news-files-list">
+                  ${fileBtns}
+                </div>
+              </div>
+            `;
+          }
+        }
+
+        // Images Gallery HTML
+        let imagesHtml = '';
+        if (news.images && news.images.length > 0) {
+          let imgItems = '';
+          news.images.forEach((imgSrc) => {
+            imgItems += `
+              <div class="news-img-wrapper" onclick="openImageViewer('${escapeHtml(imgSrc)}', '${escapeHtml(news.title)}')">
+                <img src="${escapeHtml(imgSrc)}" alt="รูปภาพประกอบ" loading="lazy">
+                <div class="news-img-overlay">
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </div>
+              </div>
+            `;
+          });
+          imagesHtml = `
+            <div class="news-gallery-grid">
+              ${imgItems}
+            </div>
+          `;
+        }
+
+        // Badge color choice
+        let badgeClass = "badge-green";
+        if (news.badge === "สำคัญมาก") badgeClass = "badge-danger";
+        else if (news.badge === "กำหนดการวัดผล") badgeClass = "badge-yellow";
+
+        html += `
+          <div class="news-card-block">
+            <div class="news-card-header">
+              <div class="news-meta-group">
+                <span class="badge ${badgeClass}"><i class="fa-solid fa-tag"></i> ${escapeHtml(news.badge || 'ข่าวประชาสัมพันธ์')}</span>
+                <span class="news-date"><i class="fa-regular fa-calendar"></i> ${escapeHtml(formatThaiDate(news.date || ''))}</span>
+              </div>
+              ${appState.isAdmin ? `
+                <div style="display: flex; gap: 0.3rem;">
+                  <button class="btn btn-ghost btn-sm" onclick="openEditNewsModal('${news.id}')" title="แก้ไขข่าว"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                  <button class="btn btn-danger btn-sm" onclick="confirmDeleteNews('${news.id}')" title="ลบข่าว"><i class="fa-solid fa-trash"></i> ลบ</button>
+                </div>
+              ` : ''}
+            </div>
+            
+            <h3 class="news-title">${escapeHtml(news.title)}</h3>
+            <div class="news-content">${escapeHtml(news.content)}</div>
+            
+            ${imagesHtml}
+            ${filesHtml}
+          </div>
+        `;
+      });
+
+      feedList.innerHTML = html;
+
+      // Render Load More Button (+5 items per click)
+      if (loadMoreContainer) {
+        if (appState.newsVisibleCount < totalNews) {
+          const remainingCount = totalNews - visibleNews.length;
+          const nextBatch = Math.min(5, remainingCount);
+          loadMoreContainer.innerHTML = `
+            <div style="text-align: center;">
+              <button class="btn btn-outline-green w-100" onclick="loadMoreNews()" style="padding: 0.7rem 1.25rem; font-weight: 600; background: var(--pastel-green-light); border: 1.5px solid var(--primary-green);">
+                <i class="fa-solid fa-chevron-down"></i> ดูข่าวประชาสัมพันธ์เพิ่มเติม (+${nextBatch} ข่าว) &nbsp;
+                <span style="font-size: 0.825rem; opacity: 0.85; font-weight: normal;">(กำลังแสดง ${visibleNews.length} จากทั้งหมด ${totalNews} ข่าว)</span>
+              </button>
+            </div>
+          `;
+        } else if (totalNews > 5) {
+          loadMoreContainer.innerHTML = `
+            <div style="text-align: center; padding: 0.6rem 1rem; background: var(--pastel-green-light); border-radius: var(--radius-md); border: 1px solid #a8e6cf; font-size: 0.875rem; color: var(--primary);">
+              <i class="fa-solid fa-circle-check"></i> แสดงข่าวประชาสัมพันธ์ครบทั้งหมด ${totalNews} ข่าวแล้ว
+              <button class="btn btn-ghost btn-sm" style="margin-left: 0.75rem; background: #ffffff; padding: 0.2rem 0.6rem;" onclick="resetNewsCount()">
+                <i class="fa-solid fa-chevron-up"></i> ย่อเหลือ 5 ข่าวแรก
+              </button>
+            </div>
+          `;
+        } else {
+          loadMoreContainer.innerHTML = '';
+        }
+      }
+    }
+
+    function loadMoreNews() {
+      appState.newsVisibleCount += 5;
+      renderNewsFeed();
+    }
+
+    function resetNewsCount() {
+      appState.newsVisibleCount = 5;
+      renderNewsFeed();
+      const newsSection = document.querySelector('.news-section-card');
+      if (newsSection) {
+        newsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // --- NEWS MODAL & CRUD LOGIC ---
+    function openAddNewsModal() {
+      document.getElementById("newsId").value = "";
+      document.getElementById("newsTitle").value = "";
+      document.getElementById("newsBadge").value = "ข่าวประชาสัมพันธ์";
+      document.getElementById("newsContent").value = "";
+      document.getElementById("file1Name").value = "";
+      document.getElementById("file1Url").value = "";
+      document.getElementById("file2Name").value = "";
+      document.getElementById("file2Url").value = "";
+      document.getElementById("file3Name").value = "";
+      document.getElementById("file3Url").value = "";
+      document.getElementById("newsImageUrlInput").value = "";
+      document.getElementById("newsImageFileInput").value = "";
+      
+      appState.tempNewsImages = [];
+      renderModalImagesPreview();
+
+      document.getElementById("newsModalTitle").innerHTML = `<i class="fa-solid fa-bullhorn"></i> เพิ่มข่าวประชาสัมพันธ์ใหม่`;
+      openModal("newsModal");
+    }
+
+    function openEditNewsModal(id) {
+      const item = appState.news.find(n => n.id === id);
+      if (!item) return;
+
+      document.getElementById("newsId").value = item.id;
+      document.getElementById("newsTitle").value = item.title || "";
+      document.getElementById("newsBadge").value = item.badge || "ข่าวประชาสัมพันธ์";
+      document.getElementById("newsContent").value = item.content || "";
+
+      // Files 1, 2, 3
+      const files = item.files || [];
+      document.getElementById("file1Name").value = files[0] ? files[0].name : "";
+      document.getElementById("file1Url").value = files[0] ? files[0].url : "";
+      document.getElementById("file2Name").value = files[1] ? files[1].name : "";
+      document.getElementById("file2Url").value = files[1] ? files[1].url : "";
+      document.getElementById("file3Name").value = files[2] ? files[2].name : "";
+      document.getElementById("file3Url").value = files[2] ? files[2].url : "";
+
+      appState.tempNewsImages = item.images ? [...item.images] : [];
+      renderModalImagesPreview();
+
+      document.getElementById("newsModalTitle").innerHTML = `<i class="fa-solid fa-pen-to-square"></i> แก้ไขข่าวประชาสัมพันธ์`;
+      openModal("newsModal");
+    }
+
+    function handleNewsImageFilesUpload(e) {
+      const files = Array.from(e.target.files);
+      if (!files || files.length === 0) return;
+
+      showGlobalLoader("กำลังประมวลผลรูปภาพ...");
+      let loadedCount = 0;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          appState.tempNewsImages.push(evt.target.result);
+          loadedCount++;
+          if (loadedCount === files.length) {
+            renderModalImagesPreview();
+            hideGlobalLoader();
+            showToast("success", `เพิ่มรูปภาพ ${files.length} รูปเรียบร้อย`);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function addNewsImageUrl() {
+      const input = document.getElementById("newsImageUrlInput");
+      const url = input.value.trim();
+      if (url) {
+        appState.tempNewsImages.push(url);
+        input.value = "";
+        renderModalImagesPreview();
+        showToast("success", "เพิ่ม URL รูปภาพสำเร็จ");
+      }
+    }
+
+    function removeModalNewsImage(index) {
+      appState.tempNewsImages.splice(index, 1);
+      renderModalImagesPreview();
+    }
+
+    function renderModalImagesPreview() {
+      const container = document.getElementById("newsModalImagesPreview");
+      if (!appState.tempNewsImages || appState.tempNewsImages.length === 0) {
+        container.innerHTML = `<span style="font-size: 0.825rem; color: var(--text-muted); grid-column: 1/-1;">ยังไม่ได้เลือกรูปภาพประกอบ</span>`;
+        return;
+      }
+
+      let html = '';
+      appState.tempNewsImages.forEach((imgSrc, idx) => {
+        html += `
+          <div style="position: relative; aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-color);">
+            <img src="${escapeHtml(imgSrc)}" style="width:100%; height:100%; object-fit: cover;">
+            <button type="button" onclick="removeModalNewsImage(${idx})" style="position: absolute; top:2px; right:2px; background: rgba(239,68,68,0.9); color:#fff; border:none; width:22px; height:22px; border-radius:50%; cursor:pointer; font-size:10px; display:flex; align-items:center; justify-content:center;" title="ลบรูปนี้">&times;</button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function handleSaveNews(e) {
+      e.preventDefault();
+      const id = document.getElementById("newsId").value;
+      const title = document.getElementById("newsTitle").value.trim();
+      const badge = document.getElementById("newsBadge").value;
+      const content = document.getElementById("newsContent").value.trim();
+
+      const f1Name = document.getElementById("file1Name").value.trim();
+      const f1Url = document.getElementById("file1Url").value.trim();
+      const f2Name = document.getElementById("file2Name").value.trim();
+      const f2Url = document.getElementById("file2Url").value.trim();
+      const f3Name = document.getElementById("file3Name").value.trim();
+      const f3Url = document.getElementById("file3Url").value.trim();
+
+      if (!title || !content) {
+        showToast("warning", "กรุณากรอกหัวเรื่องและเนื้อหาข่าวให้ครบถ้วน");
+        return;
+      }
+
+      showGlobalLoader("กำลังบันทึกข่าวประชาสัมพันธ์...");
+
+      const filesArr = [];
+      if (f1Url) filesArr.push({ name: f1Name || "ไฟล์แนบ 1", url: f1Url });
+      if (f2Url) filesArr.push({ name: f2Name || "ไฟล์แนบ 2", url: f2Url });
+      if (f3Url) filesArr.push({ name: f3Name || "ไฟล์แนบ 3", url: f3Url });
+
+      const todayStr = new Date().toLocaleDateString('th-TH', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+
+      if (id) {
+        // Update Existing News
+        const idx = appState.news.findIndex(n => n.id === id);
+        if (idx !== -1) {
+          appState.news[idx] = {
+            ...appState.news[idx],
+            title,
+            badge,
+            content,
+            files: filesArr,
+            images: [...appState.tempNewsImages]
+          };
+        }
+        showToast("success", "แก้ไขข่าวประชาสัมพันธ์เรียบร้อยแล้ว");
+      } else {
+        // Create New News
+        const newNewsObj = {
+          id: "news_" + Date.now(),
+          title,
+          badge,
+          date: todayStr,
+          content,
+          files: filesArr,
+          images: [...appState.tempNewsImages]
+        };
+        appState.news.unshift(newNewsObj); // Add to top!
+        showToast("success", "เพิ่มข่าวประชาสัมพันธ์ใหม่เรียบร้อยแล้ว");
+      }
+
+      saveNewsToStorage();
+      closeModal("newsModal");
+      renderNewsFeed();
+      hideGlobalLoader();
+    }
+
+    function confirmDeleteNews(id) {
+      const item = appState.news.find(n => n.id === id);
+      if (!item) return;
+
+      Swal.fire({
+        title: 'ยืนยันการลบข่าวประชาสัมพันธ์?',
+        text: `คุณต้องการลบ "${item.title}" ออกใช่หรือไม่`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ใช่, ลบข่าวนี้!',
+        cancelButtonText: 'ยกเลิก'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          showGlobalLoader("กำลังลบข่าว...");
+          appState.news = appState.news.filter(n => n.id !== id);
+          saveNewsToStorage();
+          renderNewsFeed();
+          hideGlobalLoader();
+          showToast("success", "ลบข่าวประชาสัมพันธ์สำเร็จแล้ว");
+        }
+      });
+    }
+
+    // --- IMAGE VIEWER LIGHTBOX ---
+    function openImageViewer(imgSrc, caption) {
+      document.getElementById("viewerModalImg").src = imgSrc;
+      document.getElementById("viewerModalCaption").textContent = caption || "รูปภาพประกอบข่าวประชาสัมพันธ์";
+      openModal("imageViewerModal");
+    }
+
+    // --- NAVIGATION & SIDEBAR RENDERING ---
+    function renderSidebarMenu() {
+      const listContainer = document.getElementById("sidebarMenuList");
+      const badgeCount = document.getElementById("systemCountBadge");
+      
+      badgeCount.textContent = `${appState.systems.length} ระบบ`;
+      let html = '';
+
+      // Always rendering Homepage Tab at top
+      const isHomeActive = appState.activeTab === "home" ? "active" : "";
+      html += `
+        <li class="nav-item">
+          <a href="javascript:void(0)" onclick="switchTab('home')" class="nav-link ${isHomeActive}">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+              <span class="nav-text">หน้าแรก (Home)</span>
+            </div>
+          </a>
+        </li>
+      `;
+
+      // Render Dynamic External Systems
+      appState.systems.forEach((sys, index) => {
+        const isActive = appState.activeTab === sys.id ? "active" : "";
+        const iconClass = sys.icon || "fa-solid fa-globe";
+
+        html += `
+          <li class="nav-item">
+            <div class="nav-link ${isActive}" onclick="switchTab('${sys.id}')">
+              <div class="nav-link-left">
+                <span class="nav-icon"><i class="${iconClass}"></i></span>
+                <span class="nav-text" title="${escapeHtml(sys.title)}">${escapeHtml(sys.title)}</span>
+              </div>
+              ${appState.isAdmin ? `
+                <div class="admin-item-actions" onclick="event.stopPropagation()">
+                  ${index > 0 ? `<button class="btn-action-icon" onclick="moveSystemUp(${index})" title="เลื่อนขึ้น"><i class="fa-solid fa-arrow-up"></i></button>` : ''}
+                  ${index < appState.systems.length - 1 ? `<button class="btn-action-icon" onclick="moveSystemDown(${index})" title="เลื่อนลง"><i class="fa-solid fa-arrow-down"></i></button>` : ''}
+                  <button class="btn-action-icon" onclick="openEditSystemModal('${sys.id}')" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn-action-icon delete" onclick="confirmDeleteSystem('${sys.id}')" title="ลบ"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              ` : ''}
+            </div>
+          </li>
+        `;
+      });
+
+      listContainer.innerHTML = html;
+    }
+
+    function switchTab(tabId) {
+      appState.activeTab = tabId;
+      renderSidebarMenu();
+      renderTopScrollTabs();
+
+      // Close mobile sidebar if open
+      document.getElementById("mainSidebar").classList.remove("open");
+
+      const homeView = document.getElementById("view-home");
+      const embedView = document.getElementById("view-embedded");
+
+      if (tabId === "home") {
+        homeView.classList.add("active");
+        embedView.classList.remove("active");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const systemObj = appState.systems.find(s => s.id === tabId);
+        if (!systemObj) return;
+
+        homeView.classList.remove("active");
+        embedView.classList.add("active");
+
+        // Set Embedded Header Data
+        document.getElementById("activeSystemTitle").textContent = systemObj.title;
+        document.getElementById("activeSystemIcon").innerHTML = `<i class="${systemObj.icon || 'fa-solid fa-globe'}"></i>`;
+        document.getElementById("btnExternalOpen").href = systemObj.url;
+
+        // Set Iframe Src
+        const iframe = document.getElementById("systemIframe");
+        const iframeLoader = document.getElementById("iframeLoader");
+        
+        iframeLoader.classList.remove("hidden");
+        iframe.src = systemObj.url;
+
+        iframe.onload = function() {
+          iframeLoader.classList.add("hidden");
+        };
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function reloadIframe() {
+      const iframe = document.getElementById("systemIframe");
+      const iframeLoader = document.getElementById("iframeLoader");
+      if (iframe.src && iframe.src !== "about:blank") {
+        iframeLoader.classList.remove("hidden");
+        iframe.src = iframe.src;
+      }
+    }
+
+    function toggleMobileSidebar() {
+      document.getElementById("mainSidebar").classList.toggle("open");
+    }
+
+    // --- HOME GRID & TABLE RENDERING ---
+    function renderHomeGrid() {
+      const grid = document.getElementById("homeSystemsGrid");
+      const tableBody = document.getElementById("systemsTableBody");
+
+      if (appState.systems.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: #ffffff; border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+            <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+            <p style="color: var(--text-muted);">ยังไม่มีรายการระบบงานในขณะนี้</p>
+            ${appState.isAdmin ? `<button class="btn btn-primary btn-sm" style="margin-top: 0.75rem;" onclick="openAddSystemModal()"><i class="fa-solid fa-plus"></i> เพิ่มระบบแรกเลย</button>` : ''}
+          </div>
+        `;
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">ไม่มีข้อมูลระบบงานในตาราง</td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Render Cards
+      let cardsHtml = '';
+      let tableHtml = '';
+
+      appState.systems.forEach((sys, index) => {
+        cardsHtml += `
+          <div class="system-card">
+            <div class="card-top">
+              <div class="card-icon-box">
+                <i class="${sys.icon || 'fa-solid fa-globe'}"></i>
+              </div>
+              <div class="card-info">
+                <h3 class="card-title">${escapeHtml(sys.title)}</h3>
+                <span class="badge badge-green card-category">${escapeHtml(sys.category || 'ระบบวัดผล')}</span>
+              </div>
+            </div>
+            <p class="card-desc">${escapeHtml(sys.desc || 'ระบบสารสนเทศสำหรับจัดการข้อมูลและวัดผลการเรียนรู้ โรงเรียนเสาไห้ "วิมลวิทยานุกูล"')}</p>
+            <div class="card-bottom">
+              <button class="btn btn-primary btn-sm" onclick="switchTab('${sys.id}')">
+                <i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบงาน
+              </button>
+              ${appState.isAdmin ? `
+                <div style="display: flex; gap: 0.3rem;">
+                  <button class="btn btn-ghost btn-sm" onclick="openEditSystemModal('${sys.id}')" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
+                  <button class="btn btn-danger btn-sm" onclick="confirmDeleteSystem('${sys.id}')" title="ลบ"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+
+        tableHtml += `
+          <tr>
+            <td style="text-align: center; font-weight: 600;">${index + 1}</td>
+            <td style="text-align: center; font-size: 1.1rem; color: var(--primary);"><i class="${sys.icon || 'fa-solid fa-globe'}"></i></td>
+            <td style="font-weight: 500;">${escapeHtml(sys.title)}</td>
+            <td><span class="badge badge-green">${escapeHtml(sys.category || 'ทั่วไป')}</span></td>
+            <td style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(sys.desc || '-')}</td>
+            <td style="text-align: center;">
+              <button class="btn btn-primary btn-sm" onclick="switchTab('${sys.id}')">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> เปิดใช้งาน
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      grid.innerHTML = cardsHtml;
+      tableBody.innerHTML = tableHtml;
+    }
+
+    // --- REORDER SYSTEMS (UP & DOWN) ---
+    function moveSystemUp(index) {
+      if (index <= 0) return;
+      showGlobalLoader("กำลังจัดลำดับ...");
+      const temp = appState.systems[index];
+      appState.systems[index] = appState.systems[index - 1];
+      appState.systems[index - 1] = temp;
+      saveSystemsToStorage();
+      renderSidebarMenu();
+      renderHomeGrid();
+      hideGlobalLoader();
+      showToast("success", "สลับลำดับขึ้นสำเร็จ");
+    }
+
+    function moveSystemDown(index) {
+      if (index >= appState.systems.length - 1) return;
+      showGlobalLoader("กำลังจัดลำดับ...");
+      const temp = appState.systems[index];
+      appState.systems[index] = appState.systems[index + 1];
+      appState.systems[index + 1] = temp;
+      saveSystemsToStorage();
+      renderSidebarMenu();
+      renderHomeGrid();
+      hideGlobalLoader();
+      showToast("success", "สลับลำดับลงสำเร็จ");
+    }
+
+    // --- CRUD SYSTEMS (ADD / EDIT / DELETE WITH SWEETALERT) ---
+    function openAddSystemModal() {
+      document.getElementById("sysId").value = "";
+      document.getElementById("sysTitle").value = "";
+      document.getElementById("sysUrl").value = "";
+      document.getElementById("sysCategory").value = "งานวัดผล";
+      document.getElementById("sysDesc").value = "";
+      selectIcon("fa-solid fa-globe");
+      document.getElementById("systemModalTitle").innerHTML = `<i class="fa-solid fa-plus-circle"></i> เพิ่มระบบงานใหม่`;
+      openModal("systemModal");
+    }
+
+    function openEditSystemModal(id) {
+      const sys = appState.systems.find(s => s.id === id);
+      if (!sys) return;
+
+      document.getElementById("sysId").value = sys.id;
+      document.getElementById("sysTitle").value = sys.title;
+      document.getElementById("sysUrl").value = sys.url;
+      document.getElementById("sysCategory").value = sys.category || "";
+      document.getElementById("sysDesc").value = sys.desc || "";
+      selectIcon(sys.icon || "fa-solid fa-globe");
+      document.getElementById("systemModalTitle").innerHTML = `<i class="fa-solid fa-pen-to-square"></i> แก้ไขข้อมูลระบบงาน`;
+      openModal("systemModal");
+    }
+
+    function selectIcon(iconClass) {
+      document.getElementById("sysIcon").value = iconClass;
+      const options = document.querySelectorAll("#iconPickerGrid .icon-option");
+      options.forEach(opt => {
+        if (opt.getAttribute("data-icon") === iconClass) {
+          opt.classList.add("selected");
+        } else {
+          opt.classList.remove("selected");
+        }
+      });
+    }
+
+    function handleSaveSystem(e) {
+      e.preventDefault();
+      const id = document.getElementById("sysId").value;
+      const title = document.getElementById("sysTitle").value.trim();
+      const url = document.getElementById("sysUrl").value.trim();
+      const category = document.getElementById("sysCategory").value.trim();
+      const desc = document.getElementById("sysDesc").value.trim();
+      const icon = document.getElementById("sysIcon").value || "fa-solid fa-globe";
+
+      if (!title || !url) {
+        showToast("warning", "กรุณากรอกข้อมูลให้ครบถ้วน");
+        return;
+      }
+
+      showGlobalLoader("กำลังบันทึกข้อมูล...");
+
+      if (id) {
+        // Update
+        const index = appState.systems.findIndex(s => s.id === id);
+        if (index !== -1) {
+          appState.systems[index] = { ...appState.systems[index], title, url, category, desc, icon };
+        }
+        showToast("success", "แก้ไขระบบงานเรียบร้อยแล้ว");
+      } else {
+        // Create
+        const newSys = {
+          id: "sys_" + Date.now(),
+          title,
+          url,
+          category,
+          desc,
+          icon
+        };
+        appState.systems.push(newSys);
+        showToast("success", "เพิ่มระบบงานใหม่เรียบร้อยแล้ว");
+      }
+
+      saveSystemsToStorage();
+      closeModal("systemModal");
+      renderSidebarMenu();
+      renderHomeGrid();
+      hideGlobalLoader();
+    }
+
+    function confirmDeleteSystem(id) {
+      const sys = appState.systems.find(s => s.id === id);
+      if (!sys) return;
+
+      Swal.fire({
+        title: 'ยืนยันการลบระบบงาน?',
+        text: `คุณต้องการลบ "${sys.title}" ออกจากระบบใช่หรือไม่`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ใช่, ลบระบบงาน!',
+        cancelButtonText: 'ยกเลิก'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          showGlobalLoader("กำลังลบระบบงาน...");
+          appState.systems = appState.systems.filter(s => s.id !== id);
+          saveSystemsToStorage();
+
+          if (appState.activeTab === id) {
+            switchTab("home");
+          } else {
+            renderSidebarMenu();
+            renderHomeGrid();
+          }
+
+          hideGlobalLoader();
+          showToast("success", "ลบระบบงานสำเร็จแล้ว");
+        }
+      });
+    }
+
+    // --- LOGO MANAGEMENT (ADMIN) ---
+    function renderHeaderLogo() {
+      const img = document.getElementById("headerLogo");
+      const preview = document.getElementById("logoPreviewImg");
+      img.src = appState.logoUrl;
+      preview.src = appState.logoUrl;
+    }
+
+    function previewLogoUrl(url) {
+      if (url && url.trim() !== "") {
+        document.getElementById("logoPreviewImg").src = url.trim();
+      }
+    }
+
+    function previewLogoFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          document.getElementById("logoPreviewImg").src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleSaveLogo(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById("logoFileInput");
+      const urlInput = document.getElementById("logoUrlInput").value.trim();
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          appState.logoUrl = evt.target.result;
+          localStorage.setItem("wimon_logo", appState.logoUrl);
+          renderHeaderLogo();
+          closeModal("logoModal");
+          showToast("success", "เปลี่ยนรูปโลโก้เรียบร้อยแล้ว");
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else if (urlInput !== "") {
+        appState.logoUrl = urlInput;
+        localStorage.setItem("wimon_logo", appState.logoUrl);
+        renderHeaderLogo();
+        closeModal("logoModal");
+        showToast("success", "เปลี่ยนรูปโลโก้เรียบร้อยแล้ว");
+      } else {
+        closeModal("logoModal");
+      }
+    }
+
+    function resetDefaultLogo() {
+      appState.logoUrl = DEFAULT_LOGO_SVG;
+      localStorage.setItem("wimon_logo", DEFAULT_LOGO_SVG);
+      renderHeaderLogo();
+      closeModal("logoModal");
+      showToast("info", "คืนค่าโลโก้เริ่มต้นเรียบร้อย");
+    }
+
+    // --- FOOTER CREDITS MANAGEMENT (ADMIN) ---
+    function renderFooterText() {
+      document.getElementById("footerTextDisplay").textContent = appState.footerText;
+      document.getElementById("footerTextInput").value = appState.footerText;
+    }
+
+    function handleSaveFooter(e) {
+      e.preventDefault();
+      const val = document.getElementById("footerTextInput").value.trim();
+      if (val) {
+        appState.footerText = val;
+        localStorage.setItem("wimon_footer", val);
+        renderFooterText();
+        closeModal("footerModal");
+        showToast("success", "บันทึกข้อความท้ายเว็บสำเร็จ");
+      }
+    }
+
+    // --- MODAL HELPERS ---
+    function openModal(id) {
+      if (id === 'themeModal' && !appState.isAdmin) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'เฉพาะผู้ดูแลระบบ (Admin)',
+          text: 'สิทธิ์การปรับแต่งโทนสีและโหมดมืด ถูกสงวนไว้สำหรับผู้ดูแลระบบเท่านั้น',
+          confirmButtonColor: '#2e7d32',
+          confirmButtonText: 'ตกลง'
+        });
+        return;
+      }
+      document.getElementById(id).classList.add("active");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+    }
+
+    // Close modal when pressing ESC or clicking backdrop
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal-backdrop.active").forEach(m => m.classList.remove("active"));
+      }
+    });
+
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", function(e) {
+        if (e.target === this) {
+          this.classList.remove("active");
+        }
+      });
+    });
+
+    // --- THAI DATE FORMATTING UTILITY ---
+    function formatThaiDate(dateInput) {
+      if (!dateInput) return '';
+      const str = String(dateInput).trim();
+      
+      // Matches standard ISO dates like 2026-09-25T17:00:00.000Z or 2026-09-25 or timestamps
+      if (str.includes('-') || str.includes('T') || !isNaN(Date.parse(str))) {
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          const day = d.getDate();
+          const monthNames = [
+            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+          ];
+          const month = monthNames[d.getMonth()];
+          const year = d.getFullYear() + 543;
+          return `วันที่ ${day} ${month} ${year}`;
+        }
+      }
+      return str;
+    }
+
+    // --- TOP HORIZONTAL SCROLL TABS RENDERER ---
+    function renderTopScrollTabs() {
+      const container = document.getElementById("topScrollTabsList");
+      if (!container) return;
+
+      let html = '';
+      const isHomeActive = appState.activeTab === "home" ? "active" : "";
+      html += `
+        <li>
+          <a href="javascript:void(0)" onclick="switchTab('home')" class="top-scroll-tab ${isHomeActive}">
+            <span class="tab-icon"><i class="fa-solid fa-house"></i></span>
+            <span>หน้าแรก</span>
+          </a>
+        </li>
+      `;
+
+      appState.systems.forEach(sys => {
+        const isActive = appState.activeTab === sys.id ? "active" : "";
+        const iconClass = sys.icon || "fa-solid fa-globe";
+        html += `
+          <li>
+            <a href="javascript:void(0)" onclick="switchTab('${sys.id}')" class="top-scroll-tab ${isActive}">
+              <span class="tab-icon"><i class="${iconClass}"></i></span>
+              <span>${escapeHtml(sys.title)}</span>
+            </a>
+          </li>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Helper: Escape HTML
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+  </script>
+</body>
+</html>

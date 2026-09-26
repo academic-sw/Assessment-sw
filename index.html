@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบสารสนเทศงานวัดและประเมินผล โรงเรียนเสาไห้ "วิมลวิทยานุกูล"</title>
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Default Theme Color Palette - Pastel Green, White, Pastel Yellow */
+            --primary-color: #3b7a57;
+            --primary-light: #7dbf96;
+            --primary-bg: #f3f9f5;
+            --accent-yellow: #fef08a;
+            --accent-yellow-dark: #eab308;
+            --sidebar-bg: #ffffff;
+            --sidebar-tab-bg: #e8f5e9;
+            --sidebar-tab-active: #3b7a57;
+            --sidebar-text: #2d3748;
+            --sidebar-text-active: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --header-bg: #ffffff;
+            --border-color: #cbd5e1;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.04);
+            --shadow-md: 0 6px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Mode Styling */
+        [data-theme="dark"] {
+            --primary-bg: #0f172a;
+            --sidebar-bg: #1e293b;
+            --sidebar-tab-bg: #334155;
+            --sidebar-tab-active: #3b7a57;
+            --sidebar-text: #f1f5f9;
+            --sidebar-text-active: #ffffff;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: #1e293b;
+            --header-bg: #1e293b;
+            --border-color: #334155;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.3);
+            --shadow-md: 0 6px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Global Loading Spinner Overlay */
+        #global-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        [data-theme="dark"] #global-spinner {
+            background: rgba(15, 23, 42, 0.82);
+        }
+        #global-spinner.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .spinner-ring {
+            width: 52px;
+            height: 52px;
+            border: 4px solid rgba(59, 122, 87, 0.2);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Top Header */
+        header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mobile-menu-btn {
+            display: none;
+            background: var(--sidebar-tab-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 1.25rem;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: var(--transition);
+        }
+        .mobile-menu-btn:hover {
+            background: var(--primary-color);
+            color: #ffffff;
+        }
+        
+        /* Auto-sizing Logo */
+        .brand-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            max-width: 160px;
+            overflow: hidden;
+        }
+        .brand-logo {
+            max-height: 48px;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .brand-title-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .brand-title-group h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+        .brand-title-group p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Buttons & Badges */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.82rem;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(59, 122, 87, 0.25);
+        }
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(59, 122, 87, 0.35);
+        }
+        .btn-secondary {
+            background-color: var(--accent-yellow);
+            color: #713f12;
+            border-color: #fde047;
+            font-weight: 600;
+        }
+        .btn-secondary:hover {
+            background-color: var(--accent-yellow-dark);
+            color: #ffffff;
+        }
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        .btn-outline:hover {
+            background-color: var(--sidebar-tab-bg);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .btn-danger {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .badge-primary { background: #dcfce7; color: #15803d; }
+        .badge-warning { background: #fef9c3; color: #a16207; }
+        .badge-danger { background: #fee2e2; color: #b91c1c; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+        [data-theme="dark"] .badge-primary { background: #14532d; color: #86efac; }
+        [data-theme="dark"] .badge-warning { background: #713f12; color: #fde047; }
+        [data-theme="dark"] .badge-danger { background: #7f1d1d; color: #fca5a5; }
+        [data-theme="dark"] .badge-info { background: #0c4a6e; color: #7dd3fc; }
+
+        /* Main App Layout */
+        .app-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Sidebar Navigation (Left Side) */
+        aside.sidebar {
+            width: 290px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 18px 14px;
+            gap: 16px;
+            transition: var(--transition);
+            z-index: 90;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--sidebar-tab-bg);
+        }
+        .sidebar-title {
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            list-style: none;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+            padding-right: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            background-color: var(--sidebar-tab-bg);
+            color: var(--sidebar-text);
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .nav-item:hover {
+            background-color: rgba(59, 122, 87, 0.12);
+            color: var(--primary-color);
+            border-color: var(--primary-light);
+        }
+        .nav-item.active {
+            background-color: var(--sidebar-tab-active);
+            color: var(--sidebar-text-active);
+            box-shadow: 0 4px 12px rgba(59, 122, 87, 0.3);
+            font-weight: 600;
+        }
+        .nav-item .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .nav-item i.nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .admin-nav-actions {
+            display: none;
+            gap: 4px;
+        }
+        body.is-admin .admin-nav-actions {
+            display: flex;
+        }
+        .nav-action-btn {
+            background: rgba(0, 0, 0, 0.06);
+            border: none;
+            color: inherit;
+            opacity: 0.8;
+            padding: 4px 6px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        [data-theme="dark"] .nav-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .nav-action-btn:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Main Content View Container */
+        main.main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            max-width: 100%;
+        }
+
+        /* View Panels */
+        .view-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .view-panel.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home View (News Section) */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: #ffffff;
+            padding: 24px 28px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .welcome-text h2 {
+            font-size: 1.45rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .welcome-text p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+        }
+
+        /* News Cards */
+        .news-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .news-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .news-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .news-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .news-body {
+            font-size: 0.96rem;
+            line-height: 1.75;
+            color: var(--text-color);
+            white-space: pre-line;
+            margin-bottom: 18px;
+        }
+
+        /* Image Gallery inside News */
+        .news-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .news-image-thumb {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .news-image-thumb:hover {
+            transform: scale(1.03);
+            filter: brightness(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Attached Files Section */
+        .attachments-container {
+            background-color: var(--primary-bg);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            border: 1px dashed var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .attachments-title {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .file-btn:hover {
+            background: var(--sidebar-tab-bg);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* External System iFrame Container */
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 150px);
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+        .iframe-bar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .iframe-bar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+        }
+        iframe.system-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--header-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 18px 24px;
+            text-align: center;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            padding: 16px;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            transition: var(--transition);
+        }
+        .modal-close:hover {
+            color: var(--text-color);
+        }
+        .modal-body {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .modal-footer {
+            padding: 16px 22px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background-color: var(--primary-bg);
+            border-bottom-left-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+        }
+
+        /* Form Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.92rem;
+            transition: var(--transition);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 122, 87, 0.2);
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 95px;
+        }
+
+        /* Admin Theme Customizer Color Picker Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .color-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--primary-bg);
+        }
+        .color-picker-input {
+            width: 44px;
+            height: 38px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: none;
+        }
+
+        /* Toast Alert Container */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--card-bg);
+            color: var(--text-color);
+            box-shadow: var(--shadow-lg);
+            border-left: 5px solid var(--primary-color);
+            font-size: 0.92rem;
+            font-weight: 500;
+            animation: slideInRight 0.3s forwards;
+            min-width: 290px;
+        }
+        .toast.success { border-left-color: #16a34a; }
+        .toast.error { border-left-color: #dc2626; }
+        .toast.warning { border-left-color: #ca8a04; }
+        .toast.info { border-left-color: #0284c7; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* SweetAlert Confirm Modal Styling */
+        .sweet-modal-card {
+            max-width: 420px;
+            text-align: center;
+            padding: 28px;
+        }
+        .sweet-icon {
+            font-size: 3.2rem;
+            color: #eab308;
+            margin-bottom: 14px;
+        }
+
+        /* Table Overflow Styling */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            margin-top: 12px;
+        }
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        table.custom-table th, table.custom-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        table.custom-table th {
+            background-color: var(--sidebar-tab-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Responsive Mobile & Tablet Adaptations */
+        @media (max-width: 868px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+            aside.sidebar {
+                position: fixed;
+                top: 66px;
+                left: -300px;
+                height: calc(100vh - 66px);
+                box-shadow: var(--shadow-lg);
+                background-color: var(--sidebar-bg);
+            }
+            aside.sidebar.open {
+                left: 0;
+            }
+            .welcome-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            main.main-content {
+                padding: 16px;
+            }
+            .brand-title-group h1 {
+                font-size: 0.95rem;
+            }
+            .brand-title-group p {
+                display: none;
+            }
+            .desktop-only {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Global Loading Spinner -->
+    <div id="global-spinner">
+        <div class="spinner-ring"></div>
+        <span style="font-size:0.98rem; font-weight:500; color:var(--primary-color);">กำลังโหลดข้อมูล...</span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="header-left">
+            <button class="mobile-menu-btn" id="mobileMenuToggle" title="เปิดเมนูระบบ">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="brand-logo-container" id="logoContainer">
+                <!-- Auto-sized logo inserted via JS -->
+            </div>
+            <div class="brand-title-group">
+                <h1 id="appHeaderTitle">ระบบสารสนเทศงานวัดและประเมินผล</h1>
+                <p>โรงเรียนเสาไห้ "วิมลวิทยานุกูล"</p>
+            </div>
+        </div>
+        
+        <div class="header-right">
+            <!-- System User Guide Button -->
+            <button class="btn btn-outline btn-sm" id="btnUserGuide" title="คู่มือการใช้งานระบบ">
+                <i class="fa-solid fa-circle-question"></i>
+                <span class="desktop-only">คู่มือใช้งาน</span>
+            </button>
+
+            <!-- Dark / Light Mode Toggle Button -->
+            <button class="btn btn-outline btn-sm" id="btnThemeToggle" title="สลับโหมดมืด/สว่าง">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+
+            <!-- Admin Authentication Controls -->
+            <div id="adminActionGroup">
+                <button class="btn btn-primary btn-sm" onclick="openModal('loginModal')">
+                    <i class="fa-solid fa-user-lock"></i>
+                    <span>เข้าสู่ระบบ Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <div class="app-container">
+        <!-- Sidebar Navigation (Left side) -->
+        <aside class="sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title"><i class="fa-solid fa-layer-group"></i> ระบบงานสารสนเทศ</span>
+                <span id="adminBadgeSlot"></span>
+            </div>
+            <ul class="sidebar-menu" id="sidebarNavList">
+                <!-- Sidebar tabs dynamically inserted via JS -->
+            </ul>
+
+            <!-- Admin Sidebar Operations (Add System, Theme Customizer) -->
+            <div id="adminSidebarControls" style="display:none; flex-direction:column; gap:10px; margin-top:auto; padding-top:14px; border-top:1px solid var(--border-color);">
+                <button class="btn btn-secondary btn-sm" onclick="openAddSystemModal()" style="width:100%;">
+                    <i class="fa-solid fa-plus-circle"></i> เพิ่มระบบภายนอก
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="openThemeCustomizerModal()" style="width:100%;">
+                    <i class="fa-solid fa-palette"></i> ปรับแต่งสี DB & โลโก้
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Display Content Area -->
+        <main class="main-content">
+            
+            <!-- View Panel 1: Home (News & Announcements Feed) -->
+            <section id="view-home" class="view-panel active">
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h2>ยินดีต้อนรับสู่ ระบบสารสนเทศงานวัดและประเมินผล</h2>
+                        <p>โรงเรียนเสาไห้ "วิมลวิทยานุกูล" - ศูนย์รวมข้อมูลข่าวสารประกาศและลิงก์ระบบงานวัดผลครบวงจร</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="openUserGuideModal()">
+                        <i class="fa-solid fa-book-open"></i> คำแนะนำการใช้งาน
+                    </button>
+                </div>
+
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fa-solid fa-bullhorn"></i> ข่าวประชาสัมพันธ์ล่าสุด</h2>
+                    <div id="adminNewsBtnSlot">
+                        <!-- Admin add news button inserted JS -->
+                    </div>
+                </div>
+
+                <!-- News Cards Feed Container -->
+                <div class="news-feed" id="newsFeedList">
+                    <!-- News items inserted dynamically JS -->
+                </div>
+
+                <!-- Load More News Button Slot -->
+                <div id="loadMoreNewsSlot" style="text-align:center; margin-top:24px;"></div>
+            </section>
+
+            <!-- View Panel 2: External System iFrame Embedded Viewer -->
+            <section id="view-iframe" class="view-panel">
+                <div class="iframe-container">
+                    <div class="iframe-bar">
+                        <span class="iframe-bar-title" id="iframeTitle"><i class="fa-solid fa-window-maximize"></i> ระบบสารสนเทศ</span>
+                        <div style="display:flex; gap:8px;">
+                            <a href="#" target="_blank" class="btn btn-outline btn-sm" id="iframeExternalBtn" title="เปิดดูในแท็บใหม่ของเบราว์เซอร์">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> เปิดในหน้าต่างใหม่
+                            </a>
+                            <button class="btn btn-outline btn-sm" onclick="reloadIframe()" title="โหลดหน้าเว็บใหม่">
+                                <i class="fa-solid fa-rotate-right"></i> รีเฟรช
+                            </button>
+                        </div>
+                    </div>
+                    <iframe src="" class="system-iframe" id="systemIframe" title="ระบบสารสนเทศภายนอก"></iframe>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Bottom Footer -->
+    <footer>
+        <p id="footerCreditText">พัฒนาโดย งานวัดและประเมินผล โรงเรียนเสาไห้ "วิมลวิทยานุกูล"</p>
+    </footer>
+
+    <!-- Toast Notification Message Layer -->
+    <div id="toast-container"></div>
+
+    <!-- APPLICATION MODALS -->
+
+    <!-- Modal 1: Admin Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa-solid fa-user-shield"></i> เข้าสู่ระบบผู้ดูแลระบบ (Admin)</h3>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อผู้ใช้ (Username)</label>
+                        <input type="text" id="loginUsername" class="form-control" placeholder="ป้อน Username (admin)" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">รหัสผ่าน (Password)</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="ป้อน Password (admin752)" required autocomplete="current-password">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('loginModal')">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: System User Access Guide Modal (Student & Teacher System Access Only) -->
+    <div class="modal-overlay" id="userGuideModal">
+        <div class="modal-card" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa-solid fa-circle-info"></i> คู่มือการเข้าสู่ระบบงานสารสนเทศวัดผล</h3>
+                <button class="modal-close" onclick="closeModal('userGuideModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex; flex-direction:column; gap:16px; font-size:0.94rem;">
+                    <div style="background:var(--primary-bg); padding:16px; border-radius:var(--radius-sm); border-left:4px solid var(--primary-color);">
+                        <h4 style="color:var(--primary-color); font-weight:600; margin-bottom:6px;"><i class="fa-solid fa-1"></i> วิธีการเข้าดูผลการเรียนออนไลน์ (SGS)</h4>
+                        <p style="color:var(--text-muted); line-height:1.6;">1. กดเลือกเมนู <strong>"ระบบเช็คผลการเรียน (SGS)"</strong> ที่แถบเมนูด้านซ้ายมือ<br>2. ป้อนเลขประจำตัวนักเรียน และเลขประจำตัวประชาชน เพื่อล็อกอินเข้าดูผลการเรียน</p>
+                    </div>
+
+                    <div style="background:var(--primary-bg); padding:16px; border-radius:var(--radius-sm); border-left:4px solid var(--accent-yellow-dark);">
+                        <h4 style="color:var(--accent-yellow-dark); font-weight:600; margin-bottom:6px;"><i class="fa-solid fa-2"></i> การเปิดใช้งานบนโทรศัพท์มือถือ หรือ แท็บเล็ต</h4>
+                        <p style="color:var(--text-muted); line-height:1.6;">กดที่ไอคอนเมนู <i class="fa-solid fa-bars"></i> บริเวณมุมบนซ้าย เพื่อเลือกสลับระบบงานต่าง ๆ ได้ทันทีโดยไม่ต้องเปิดแท็บเบราว์เซอร์ใหม่</p>
+                    </div>
+
+                    <div style="background:var(--primary-bg); padding:16px; border-radius:var(--radius-sm); border-left:4px solid var(--primary-color);">
+                        <h4 style="color:var(--primary-color); font-weight:600; margin-bottom:6px;"><i class="fa-solid fa-3"></i> การยื่นขอแก้ไขผลการเรียน (ติด 0, ร, มส)</h4>
+                        <p style="color:var(--text-muted); line-height:1.6;">ดาวน์โหลดแบบฟอร์มไฟล์แนบในข่าวประชาสัมพันธ์ นำไปติดต่อครูประจำวิชาเพื่อดำเนินการตามกำหนดการของงานวัดผล</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('userGuideModal')">รับทราบและเข้าใจแล้ว</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Add / Edit News Modal -->
+    <div class="modal-overlay" id="newsModal">
+        <div class="modal-card" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="newsModalTitle"><i class="fa-solid fa-newspaper"></i> เพิ่มข่าวประชาสัมพันธ์</h3>
+                <button class="modal-close" onclick="closeModal('newsModal')">&times;</button>
+            </div>
+            <form id="newsForm">
+                <input type="hidden" id="newsId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">หัวข้อข่าวประชาสัมพันธ์ *</label>
+                        <input type="text" id="newsTitleInput" class="form-control" placeholder="เช่น ประกาศผลการเรียน ภาคเรียนที่ 1 ปีการศึกษา 2569" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">แท็กหมวดหมู่ *</label>
+                        <select id="newsTagInput" class="form-control" required>
+                            <option value="ทั่วไป">ข่าวทั่วไป</option>
+                            <option value="ด่วน">ข่าวเร่งด่วน</option>
+                            <option value="การสอบ">การสอบ/วัดผล</option>
+                            <option value="ประกาศผล">ประกาศผลการเรียน</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">เนื้อหาข่าวสาร *</label>
+                        <textarea id="newsContentInput" class="form-control" rows="5" placeholder="พิมพ์รายละเอียดเนื้อหาข่าวที่นี่..." required></textarea>
+                    </div>
+
+                    <!-- News Images Upload & URL inputs -->
+                    <div style="border-top:1px solid var(--border-color); padding-top:14px;">
+                        <label class="form-label" style="font-weight:600;"><i class="fa-solid fa-images"></i> รูปภาพประกอบข่าวสาร (บันทึกลง Google Drive)</label>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <input type="file" id="newsImagesFileInput" class="form-control" accept="image/*" multiple title="เลือกไฟล์รูปภาพจากอุปกรณ์">
+                            <span style="font-size:0.8rem; color:var(--text-muted);">หรือ วาง URL รูปภาพ (คั่นด้วยเครื่องหมายจุลภาค , หรือบรรทัดใหม่)</span>
+                            <textarea id="newsImagesInput" class="form-control" rows="2" placeholder="https://images.unsplash.com/... , https://..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Attachments Files Upload & URL Inputs (File 1, File 2, File 3) -->
+                    <div style="border-top:1px solid var(--border-color); padding-top:14px; display:flex; flex-direction:column; gap:12px;">
+                        <label class="form-label" style="font-weight:600;"><i class="fa-solid fa-paperclip"></i> ไฟล์แนบประกอบข่าวสาร (บันทึกลง Folder ID: 1ehgB_CLugTr96TwYLTbSISYyO4K5rGob)</label>
+                        
+                        <!-- File 1 -->
+                        <div style="background:var(--primary-bg); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; flex-direction:column; gap:6px;">
+                            <span style="font-size:0.82rem; font-weight:600; color:var(--primary-color);">ไฟล์แนบที่ 1</span>
+                            <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:8px;">
+                                <input type="text" id="file1Name" class="form-control" placeholder="ชื่อไฟล์ 1 (เช่น คู่มือ.pdf)">
+                                <input type="text" id="file1Url" class="form-control" placeholder="URL หรือ เลือกไฟล์อัปโหลด">
+                            </div>
+                            <input type="file" id="file1Picker" class="form-control" title="อัปโหลดไฟล์ 1">
+                        </div>
+
+                        <!-- File 2 -->
+                        <div style="background:var(--primary-bg); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; flex-direction:column; gap:6px;">
+                            <span style="font-size:0.82rem; font-weight:600; color:var(--primary-color);">ไฟล์แนบที่ 2</span>
+                            <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:8px;">
+                                <input type="text" id="file2Name" class="form-control" placeholder="ชื่อไฟล์ 2 (เช่น ตารางสอบ.pdf)">
+                                <input type="text" id="file2Url" class="form-control" placeholder="URL หรือ เลือกไฟล์อัปโหลด">
+                            </div>
+                            <input type="file" id="file2Picker" class="form-control" title="อัปโหลดไฟล์ 2">
+                        </div>
+
+                        <!-- File 3 -->
+                        <div style="background:var(--primary-bg); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; flex-direction:column; gap:6px;">
+                            <span style="font-size:0.82rem; font-weight:600; color:var(--primary-color);">ไฟล์แนบที่ 3</span>
+                            <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:8px;">
+                                <input type="text" id="file3Name" class="form-control" placeholder="ชื่อไฟล์ 3 (เช่น คำร้องแก้ผลการเรียน.pdf)">
+                                <input type="text" id="file3Url" class="form-control" placeholder="URL หรือ เลือกไฟล์อัปโหลด">
+                            </div>
+                            <input type="file" id="file3Picker" class="form-control" title="อัปโหลดไฟล์ 3">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('newsModal')">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> บันทึกข่าวสาร</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Add / Edit External System Modal -->
+    <div class="modal-overlay" id="systemModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title" id="systemModalTitle"><i class="fa-solid fa-plus-circle"></i> เพิ่มระบบสารสนเทศภายนอก</h3>
+                <button class="modal-close" onclick="closeModal('systemModal')">&times;</button>
+            </div>
+            <form id="systemForm">
+                <input type="hidden" id="systemId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อระบบงาน *</label>
+                        <input type="text" id="systemNameInput" class="form-control" placeholder="เช่น ระบบเช็คผลการเรียน (SGS)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">URL เว็บไซต์ระบบ *</label>
+                        <input type="url" id="systemUrlInput" class="form-control" placeholder="https://sgs.bopp-obec.info/" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">ไอคอน FontAwesome (เช่น fa-graduation-cap, fa-building-columns, fa-pen-to-square)</label>
+                        <input type="text" id="systemIconInput" class="form-control" placeholder="fa-globe">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('systemModal')">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> บันทึกระบบ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 5: Admin Theme, Logo & Google Sheets Integration Modal -->
+    <div class="modal-overlay" id="themeCustomizerModal">
+        <div class="modal-card" style="max-width: 660px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa-solid fa-gears"></i> ตั้งค่าระบบ Google Sheets DB & สีเว็บไซต์</h3>
+                <button class="modal-close" onclick="closeModal('themeCustomizerModal')">&times;</button>
+            </div>
+            <form id="themeCustomizerForm">
+                <div class="modal-body">
+                    
+                    <!-- Google Apps Script Connection Setup -->
+                    <div style="background:var(--sidebar-tab-bg); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label class="form-label" style="font-weight:600; color:var(--primary-color); display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-table-cells"></i> URL ลิงก์ Google Apps Script Web App
+                            </label>
+                            <span id="dbStatusBadge" class="badge badge-warning">ยังไม่ได้เชื่อมต่อ Sheets</span>
+                        </div>
+                        <input type="url" id="googleScriptUrlInput" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                        <span style="font-size:0.78rem; color:var(--text-muted);">
+                            <i class="fa-solid fa-circle-info"></i> ป้อน URL ที่ได้จากการ Deploy Apps Script ของ Google Sheet เพื่อใช้เป็นฐานข้อมูลออนไลน์และบันทึกไฟล์ลง Drive (Folder ID: <code>1ehgB_CLugTr96TwYLTbSISYyO4K5rGob</code>)
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-image"></i> รูปภาพโลโก้โรงเรียน (อัปโหลดรูปภาพ หรือ วาง URL)</label>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <input type="file" id="themeLogoFileInput" class="form-control" accept="image/*" title="อัปโหลดไฟล์รูปภาพโลโก้">
+                            <input type="text" id="themeLogoInput" class="form-control" placeholder="https://... หรือ Data URL รูปภาพ">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-copyright"></i> ข้อความข้างล่างเว็บไซต์ (Footer Credit)</label>
+                        <input type="text" id="themeFooterInput" class="form-control" placeholder="พัฒนาโดย งานวัดและประเมินผล โรงเรียนเสาไห้ &quot;วิมลวิทยานุกูล&quot;">
+                    </div>
+
+                    <h4 style="font-size:0.98rem; font-weight:600; margin-top:10px; color:var(--primary-color); border-bottom:1px solid var(--border-color); padding-bottom:6px;">
+                        <i class="fa-solid fa-swatchbook"></i> ปรับแต่งโทนสีเว็บไซต์ (Color Customization)
+                    </h4>
+                    
+                    <div class="color-grid">
+                        <div class="color-item">
+                            <span class="form-label">สีหลัก (Primary Color)</span>
+                            <input type="color" id="colorPrimary" class="color-picker-input" value="#3b7a57">
+                        </div>
+                        <div class="color-item">
+                            <span class="form-label">สีหลักแบบอ่อน (Primary Light)</span>
+                            <input type="color" id="colorPrimaryLight" class="color-picker-input" value="#7dbf96">
+                        </div>
+                        <div class="color-item">
+                            <span class="form-label">สีเหลืองพาสเทล (Accent)</span>
+                            <input type="color" id="colorAccentYellow" class="color-picker-input" value="#fef08a">
+                        </div>
+                        <div class="color-item">
+                            <span class="form-label">สีพื้นหลังแท็บ (Tab Background)</span>
+                            <input type="color" id="colorSidebarTabBg" class="color-picker-input" value="#e8f5e9">
+                        </div>
+                        <div class="color-item">
+                            <span class="form-label">สีแท็บที่เลือก (Active Tab)</span>
+                            <input type="color" id="colorSidebarTabActive" class="color-picker-input" value="#3b7a57">
+                        </div>
+                        <div class="color-item">
+                            <span class="form-label">สีตัวอักษรหลัก (Text Color)</span>
+                            <input type="color" id="colorTextColor" class="color-picker-input" value="#1e293b">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="resetDefaultTheme()">คืนค่าเริ่มต้น</button>
+                    <button type="button" class="btn btn-outline" onclick="closeModal('themeCustomizerModal')">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> บันทึกการปรับแต่ง</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 6: Image Lightbox Preview Modal -->
+    <div class="modal-overlay" id="lightboxModal">
+        <div class="modal-card" style="max-width: 820px; background:transparent; border:none; box-shadow:none;">
+            <div style="text-align:right; margin-bottom:8px;">
+                <button class="btn btn-outline btn-sm" style="color:#fff; border-color:rgba(255,255,255,0.4); background:rgba(0,0,0,0.5);" onclick="closeModal('lightboxModal')">
+                    <i class="fa-solid fa-xmark"></i> ปิดหน้าต่าง
+                </button>
+            </div>
+            <img id="lightboxImg" src="" style="width:100%; height:auto; max-height:82vh; object-fit:contain; border-radius:var(--radius-md);" alt="รูปภาพประกอบข่าวสาร">
+        </div>
+    </div>
+
+    <!-- Modal 7: SweetAlert Delete Confirmation Modal -->
+    <div class="modal-overlay" id="sweetConfirmModal">
+        <div class="modal-card sweet-modal-card">
+            <div class="sweet-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 style="font-size:1.28rem; font-weight:600; margin-bottom:8px;" id="sweetConfirmTitle">ยืนยันการลบข้อมูล?</h3>
+            <p style="font-size:0.92rem; color:var(--text-muted); margin-bottom:22px; line-height:1.5;" id="sweetConfirmText">เมื่อลบแล้วจะไม่สามารถกู้คืนข้อมูลนี้ได้อีก</p>
+            <div style="display:flex; justify-content:center; gap:12px;">
+                <button class="btn btn-outline" id="sweetCancelBtn">ยกเลิก</button>
+                <button class="btn btn-danger" id="sweetOkBtn"><i class="fa-solid fa-trash"></i> ยืนยันการลบ</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. SEED DATA & LOCALSTORAGE & GOOGLE SHEETS DB ENGINE
+           ========================================================================== */
+        
+        // 🔗 วาง URL ของ Google Apps Script ที่ได้จากการ Deploy ที่นี่ (เพื่อให้ทุกเบราว์เซอร์และทุกอุปกรณ์ดึงข้อมูลเดียวกัน)
+        const DEFAULT_GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZSlWG6BIFF59vFP4ao2W3NAZ_trZ1xPgMwMQNuOocRz7O2-lO1kVIW9AUw8uMiylz/exec";
+
+        // Default SVG School Emblem Logo
+        const DEFAULT_LOGO_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><circle cx="50" cy="50" r="46" fill="%233b7a57"/><path d="M50 15 L78 30 L78 60 C78 75 50 88 50 88 C50 88 22 75 22 60 L22 30 Z" fill="%23fef08a" stroke="%23ffffff" stroke-width="3"/><path d="M50 28 L62 50 L38 50 Z" fill="%233b7a57"/><circle cx="50" cy="62" r="7" fill="%233b7a57"/><text x="50" y="44" font-size="10" font-weight="bold" fill="%233b7a57" text-anchor="middle">SH</text></svg>`;
+
+        const INITIAL_THEME = {
+            logoUrl: DEFAULT_LOGO_SVG,
+            footerText: 'พัฒนาโดย งานวัดและประเมินผล โรงเรียนเสาไห้ "วิมลวิทยานุกูล"',
+            colorPrimary: '#3b7a57',
+            colorPrimaryLight: '#7dbf96',
+            colorAccentYellow: '#fef08a',
+            colorSidebarTabBg: '#e8f5e9',
+            colorSidebarTabActive: '#3b7a57',
+            colorTextColor: '#1e293b'
+        };
+
+        const INITIAL_NEWS = [
+            {
+                id: 'news-101',
+                title: 'ประกาศผลการเรียน ประจำภาคเรียนที่ 1 ปีการศึกษา 2569',
+                tag: 'ประกาศผล',
+                date: '26 ก.ย. 2026',
+                content: 'โรงเรียนเสาไห้ "วิมลวิทยานุกูล" ประกาศแจ้งให้นักเรียนและผู้ปกครองทุกระดับชั้นทราบ สามารถเข้าตรวจสอบผลการเรียนประจำภาคเรียนที่ 1 ปีการศึกษา 2569 ได้ทางระบบ SGS ออนไลน์ หากนักเรียนติด 0, ร, มส ให้ดำเนินการยื่นคำร้องขอแก้ไขผลการเรียนตามกำหนดการงานวัดผล',
+                images: [
+                    'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80',
+                    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80'
+                ],
+                files: [
+                    { name: 'คู่มือการตรวจสอบผลการเรียนผ่าน_SGS.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+                    { name: 'กำหนดการยื่นขอแก้ไขผลการเรียน_1-2569.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+                    { name: 'แบบฟอร์มคำร้องขอแก้ผลการเรียน.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-102',
+                title: 'กำหนดการสอบปลายภาคเรียนที่ 1 ปีการศึกษา 2569',
+                tag: 'การสอบ',
+                date: '20 ก.ย. 2026',
+                content: 'งานวัดและประเมินผลขอแจ้งตารางการสอบปลายภาคเรียน สำหรับนักเรียนชั้นมัธยมศึกษาปีที่ 1 - 6 ขอให้นักเรียนแต่งกายด้วยชุดนักเรียนถูกระเบียบและเข้าห้องสอบตรงตามเวลาที่กำหนด',
+                images: [
+                    'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=600&q=80'
+                ],
+                files: [
+                    { name: 'ตารางสอบปลายภาค_ระดับมัธยมศึกษาตอนต้น.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+                    { name: 'ตารางสอบปลายภาค_ระดับมัธยมศึกษาตอนปลาย.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-103',
+                title: 'ประชาสัมพันธ์การลงทะเบียนซ่อมเสริมรายวิชา ภาคเรียนที่ 1',
+                tag: 'ด่วน',
+                date: '15 ก.ย. 2026',
+                content: 'เปิดรับลงทะเบียนซ่อมเสริมสำหรับนักเรียนที่มีผลการประเมินไม่ผ่านเกณฑ์ย่อยในแต่ละรายวิชา สามารถยื่นเรื่องออนไลน์ผ่านระบบลงทะเบียนซ่อมเสริมตั้งแต่วันนี้ถึงวันที่ 30 กันยายน 2569',
+                images: [
+                    'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80'
+                ],
+                files: [
+                    { name: 'คู่มือขั้นตอนการลงทะเบียนซ่อมเสริม.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-104',
+                title: 'การจัดตารางสอบกลางภาคเรียน ประจำภาคเรียนที่ 1',
+                tag: 'การสอบ',
+                date: '10 ก.ย. 2026',
+                content: 'งานวัดผลได้ดำเนินจัดเตรียมแนวปฏิบัติและข้อตกลงในการเข้าห้องสอบกลางภาคเรียน ขอให้นักเรียนทุกคนศึกษากฎระเบียบข้อบังคับและเตรียมอุปกรณ์การสอบให้พร้อม',
+                images: [],
+                files: [
+                    { name: 'ตารางสอบกลางภาค_2569.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-105',
+                title: 'แนวปฏิบัติตามเกณฑ์การประเมินผลการเรียนรู้รายวิชาพื้นฐานและเพิ่มเติม',
+                tag: 'ทั่วไป',
+                date: '01 ก.ย. 2026',
+                content: 'สรุปแนวทางการประเมินผลการเรียนรู้ตามหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน เพื่อให้คณะครูและนักเรียนใช้เป็นมาตรฐานการวัดและประเมินผลงานเดียวกัน',
+                images: [],
+                files: [
+                    { name: 'เกณฑ์การประเมินผลการเรียนรู้_2569.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-106',
+                title: 'สรุปผลการประเมินคุณภาพการศึกษาของสถานศึกษาประจำปี',
+                tag: 'ประกาศผล',
+                date: '25 ส.ค. 2026',
+                content: 'รายงานสรุปผลสัมฤทธิ์ทางการเรียนและการประเมินอ่าน คิดวิเคราะห์ เขียนของนักเรียนทุกระดับชั้น ประจำปีการศึกษาที่ผ่านมา',
+                images: [
+                    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80'
+                ],
+                files: [
+                    { name: 'รายงานสรุปผลสัมฤทธิ์ทางการเรียน.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-107',
+                title: 'ประกาศรายชื่อนักเรียนที่มีสิทธิ์สอบแก้ตัวครั้งที่ 1',
+                tag: 'ประกาศผล',
+                date: '18 ส.ค. 2026',
+                content: 'ตรวจสอบรายชื่อนักเรียนที่มีสิทธิ์เข้าสอบแก้ตัวครั้งที่ 1 พร้อมตารางห้องสอบและครูผู้สอบประจำวิชา',
+                images: [],
+                files: [
+                    { name: 'รายชื่อผู้มีสิทธิ์สอบแก้ตัว_ครั้งที่1.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            },
+            {
+                id: 'news-108',
+                title: 'การยื่นคำร้องขอเปลี่ยนกลุ่มสาระการเรียนรู้เพิ่มเติม',
+                tag: 'ทั่วไป',
+                date: '10 ส.ค. 2026',
+                content: 'แจ้งกำหนดการสำหรับนักเรียนชั้นมัธยมศึกษาปีที่ 4 ที่ประสงค์ขอเปลี่ยนวิชาเลือกเสรีในภาคเรียนถัดไป ให้ดำเนินการยื่นคำร้องผ่านฝ่ายวิชาการ',
+                images: [],
+                files: [
+                    { name: 'แบบฟอร์มคำร้องขอเปลี่ยนวิชาเลือก.pdf', url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+                ]
+            }
+        ];
+
+        const INITIAL_SYSTEMS = [
+            { id: 'sys-1', name: 'ระบบเช็คผลการเรียน (SGS)', url: 'https://sgs.bopp-obec.info/', icon: 'fa-graduation-cap' },
+            { id: 'sys-2', name: 'ระบบสำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน (OBEC)', url: 'https://www.obec.go.th/', icon: 'fa-building-columns' },
+            { id: 'sys-3', name: 'ระบบส่งแผนการจัดการเรียนรู้', url: 'https://docs.google.com', icon: 'fa-file-lines' },
+            { id: 'sys-4', name: 'ระบบยื่นคำร้องซ่อมเสริม (0, ร, มส)', url: 'https://forms.google.com', icon: 'fa-pen-to-square' }
+        ];
+
+        // Global Application State Store
+        let appState = {
+            isAdmin: false,
+            darkMode: false,
+            googleScriptUrl: localStorage.getItem('saohai_script_url') || DEFAULT_GOOGLE_SCRIPT_URL || '',
+            theme: JSON.parse(localStorage.getItem('saohai_theme')) || INITIAL_THEME,
+            news: JSON.parse(localStorage.getItem('saohai_news')) || INITIAL_NEWS,
+            systems: JSON.parse(localStorage.getItem('saohai_systems')) || INITIAL_SYSTEMS,
+            activeTab: 'home',
+            newsLimit: 5
+        };
+
+        // Async Google Apps Script Sync Helpers
+        async function syncToGoogleSheets(action, payload) {
+            if (!appState.googleScriptUrl) return;
+            try {
+                showSpinner();
+                await fetch(appState.googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: action, ...payload })
+                });
+                showToast('บันทึกข้อมูลลง Google Sheets & Drive เรียบร้อย', 'success');
+                setTimeout(fetchFromGoogleSheets, 1200);
+            } catch (err) {
+                console.error('Google Sheets Sync Error:', err);
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        async function fetchFromGoogleSheets() {
+            if (!appState.googleScriptUrl) return;
+            try {
+                showSpinner();
+                const res = await fetch(appState.googleScriptUrl + '?action=getAll');
+                const data = await res.json();
+                if (data && data.status === 'success') {
+                    if (data.news && Array.isArray(data.news) && data.news.length > 0) appState.news = data.news;
+                    if (data.systems && Array.isArray(data.systems) && data.systems.length > 0) appState.systems = data.systems;
+                    if (data.theme && typeof data.theme === 'object' && Object.keys(data.theme).length > 0) appState.theme = { ...appState.theme, ...data.theme };
+                    
+                    localStorage.setItem('saohai_news', JSON.stringify(appState.news));
+                    localStorage.setItem('saohai_systems', JSON.stringify(appState.systems));
+                    localStorage.setItem('saohai_theme', JSON.stringify(appState.theme));
+                    
+                    applyTheme();
+                    renderSidebarMenu();
+                    renderNewsFeed();
+                    showToast('ซิงค์ข้อมูลล่าสุดจาก Google Sheets สำเร็จ', 'info');
+                }
+            } catch (err) {
+                console.log('Using local cached data:', err);
+            } finally {
+                hideSpinner();
+            }
+        }
+
+        function saveThemeState() {
+            localStorage.setItem('saohai_theme', JSON.stringify(appState.theme));
+            applyTheme();
+            syncToGoogleSheets('saveTheme', { theme: appState.theme });
+        }
+        function saveNewsState() {
+            localStorage.setItem('saohai_news', JSON.stringify(appState.news));
+            renderNewsFeed();
+            syncToGoogleSheets('saveNews', { news: appState.news });
+        }
+        function saveSystemsState() {
+            localStorage.setItem('saohai_systems', JSON.stringify(appState.systems));
+            renderSidebarMenu();
+            syncToGoogleSheets('saveSystems', { systems: appState.systems });
+        }
+
+        /* ==========================================================================
+           2. UI SPINNER, TOAST, MODALS & CONFIRM DIALOGS
+           ========================================================================== */
+
+        function showSpinner() {
+            document.getElementById('global-spinner').classList.add('active');
+        }
+        function hideSpinner() {
+            document.getElementById('global-spinner').classList.remove('active');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconMap = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-xmark',
+                warning: 'fa-triangle-exclamation',
+                info: 'fa-circle-info'
+            };
+            toast.innerHTML = `<i class="fa-solid ${iconMap[type] || 'fa-bell'}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        let pendingSweetConfirmAction = null;
+        function showSweetConfirm(title, text, onConfirm) {
+            document.getElementById('sweetConfirmTitle').innerText = title;
+            document.getElementById('sweetConfirmText').innerText = text;
+            pendingSweetConfirmAction = onConfirm;
+            openModal('sweetConfirmModal');
+        }
+
+        document.getElementById('sweetCancelBtn').onclick = () => closeModal('sweetConfirmModal');
+        document.getElementById('sweetOkBtn').onclick = () => {
+            closeModal('sweetConfirmModal');
+            if (pendingSweetConfirmAction) pendingSweetConfirmAction();
+        };
+
+        /* ==========================================================================
+           3. THEME & DARK MODE RENDERING ENGINE
+           ========================================================================== */
+
+        function applyTheme() {
+            const root = document.documentElement;
+            const t = appState.theme;
+
+            if (t.colorPrimary) root.style.setProperty('--primary-color', t.colorPrimary);
+            if (t.colorPrimaryLight) root.style.setProperty('--primary-light', t.colorPrimaryLight);
+            if (t.colorAccentYellow) root.style.setProperty('--accent-yellow', t.colorAccentYellow);
+            if (t.colorSidebarTabBg) root.style.setProperty('--sidebar-tab-bg', t.colorSidebarTabBg);
+            if (t.colorSidebarTabActive) root.style.setProperty('--sidebar-tab-active', t.colorSidebarTabActive);
+            if (t.colorTextColor) root.style.setProperty('--text-color', t.colorTextColor);
+
+            // Update Brand Logo
+            const logoContainer = document.getElementById('logoContainer');
+            logoContainer.innerHTML = `<img src="${t.logoUrl || DEFAULT_LOGO_SVG}" alt="โลโก้โรงเรียนเสาไห้" class="brand-logo" id="appLogoImg">`;
+
+            // Update Footer Text
+            document.getElementById('footerCreditText').innerText = t.footerText || INITIAL_THEME.footerText;
+        }
+
+        function toggleDarkMode() {
+            appState.darkMode = !appState.darkMode;
+            if (appState.darkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+            }
+            showToast(`สลับใช้งาน${appState.darkMode ? 'โหมดมืด' : 'โหมดสว่าง'}`, 'info');
+        }
+
+        function resetDefaultTheme() {
+            appState.theme = { ...INITIAL_THEME };
+            saveThemeState();
+            closeModal('themeCustomizerModal');
+            showToast('คืนค่าธีมสีและโลโก้เริ่มต้นเรียบร้อย', 'success');
+        }
+
+        /* ==========================================================================
+           4. SIDEBAR NAVIGATION & SYSTEM TAB REORDERING
+           ========================================================================== */
+
+        function renderSidebarMenu() {
+            const list = document.getElementById('sidebarNavList');
+            list.innerHTML = '';
+
+            // 1. Home Tab (Fixed)
+            const homeLi = document.createElement('li');
+            homeLi.innerHTML = `
+                <div class="nav-item ${appState.activeTab === 'home' ? 'active' : ''}" onclick="switchTab('home')">
+                    <div class="nav-left">
+                        <i class="fa-solid fa-house nav-icon"></i>
+                        <span>หน้าแรก (ข่าวประชาสัมพันธ์)</span>
+                    </div>
+                </div>
+            `;
+            list.appendChild(homeLi);
+
+            // 2. Custom External Systems (Reorderable by Admin)
+            appState.systems.forEach((sys, index) => {
+                const li = document.createElement('li');
+                const isActive = appState.activeTab === sys.id;
+
+                li.innerHTML = `
+                    <div class="nav-item ${isActive ? 'active' : ''}" onclick="switchTab('${sys.id}')">
+                        <div class="nav-left">
+                            <i class="fa-solid ${sys.icon || 'fa-globe'} nav-icon"></i>
+                            <span title="${sys.name}">${sys.name}</span>
+                        </div>
+                        <div class="admin-nav-actions" onclick="event.stopPropagation()">
+                            <button class="nav-action-btn" title="เลื่อนขึ้น" onclick="moveSystemUp(${index})"><i class="fa-solid fa-arrow-up"></i></button>
+                            <button class="nav-action-btn" title="เลื่อนลง" onclick="moveSystemDown(${index})"><i class="fa-solid fa-arrow-down"></i></button>
+                            <button class="nav-action-btn" title="แก้ไข" onclick="openEditSystemModal('${sys.id}')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="nav-action-btn" title="ลบ" onclick="confirmDeleteSystem('${sys.id}')"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function switchTab(tabId) {
+            showSpinner();
+            appState.activeTab = tabId;
+            renderSidebarMenu();
+
+            // Auto close mobile drawer menu
+            document.getElementById('appSidebar').classList.remove('open');
+
+            setTimeout(() => {
+                if (tabId === 'home') {
+                    document.getElementById('view-home').classList.add('active');
+                    document.getElementById('view-iframe').classList.remove('active');
+                } else {
+                    const sys = appState.systems.find(s => s.id === tabId);
+                    if (sys) {
+                        document.getElementById('view-home').classList.remove('active');
+                        document.getElementById('view-iframe').classList.add('active');
+                        document.getElementById('iframeTitle').innerHTML = `<i class="fa-solid ${sys.icon || 'fa-globe'}"></i> ${sys.name}`;
+                        document.getElementById('iframeExternalBtn').href = sys.url;
+                        document.getElementById('systemIframe').src = sys.url;
+                    }
+                }
+                hideSpinner();
+            }, 250);
+        }
+
+        function reloadIframe() {
+            const iframe = document.getElementById('systemIframe');
+            if (iframe.src) {
+                showSpinner();
+                iframe.src = iframe.src;
+                setTimeout(hideSpinner, 350);
+            }
+        }
+
+        // Reorder Systems List Up / Down
+        function moveSystemUp(index) {
+            if (index > 0) {
+                const temp = appState.systems[index];
+                appState.systems[index] = appState.systems[index - 1];
+                appState.systems[index - 1] = temp;
+                saveSystemsState();
+                showToast('สลับลำดับระบบขึ้นเรียบร้อย', 'info');
+            }
+        }
+        function moveSystemDown(index) {
+            if (index < appState.systems.length - 1) {
+                const temp = appState.systems[index];
+                appState.systems[index] = appState.systems[index + 1];
+                appState.systems[index + 1] = temp;
+                saveSystemsState();
+                showToast('สลับลำดับระบบลงเรียบร้อย', 'info');
+            }
+        }
+
+        /* ==========================================================================
+           5. NEWS FEED & ATTACHMENTS RENDERING (MAX 5 ITEMS + LOAD MORE)
+           ========================================================================== */
+
+        function renderNewsFeed() {
+            const container = document.getElementById('newsFeedList');
+            const loadMoreSlot = document.getElementById('loadMoreNewsSlot');
+            const adminSlot = document.getElementById('adminNewsBtnSlot');
+            
+            if (appState.isAdmin) {
+                adminSlot.innerHTML = `
+                    <button class="btn btn-primary" onclick="openAddNewsModal()">
+                        <i class="fa-solid fa-plus-circle"></i> เพิ่มข่าวประชาสัมพันธ์
+                    </button>
+                `;
+            } else {
+                adminSlot.innerHTML = '';
+            }
+
+            if (!appState.news || appState.news.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:50px; color:var(--text-muted); background:var(--card-bg); border-radius:var(--radius-md); border:1px solid var(--border-color);">
+                        <i class="fa-solid fa-folder-open" style="font-size:3rem; margin-bottom:12px; color:var(--primary-color);"></i>
+                        <p style="font-size:1.1rem; font-weight:500;">ยังไม่มีข่าวประชาสัมพันธ์ในขณะนี้</p>
+                    </div>
+                `;
+                if (loadMoreSlot) loadMoreSlot.innerHTML = '';
+                return;
+            }
+
+            const currentLimit = appState.newsLimit || 5;
+            const totalNews = appState.news.length;
+            const visibleNews = appState.news.slice(0, currentLimit);
+
+            container.innerHTML = visibleNews.map(n => {
+                const tagClassMap = {
+                    'ทั่วไป': 'badge-primary',
+                    'ด่วน': 'badge-danger',
+                    'การสอบ': 'badge-warning',
+                    'ประกาศผล': 'badge-info'
+                };
+                const badgeClass = tagClassMap[n.tag] || 'badge-primary';
+
+                // Image Gallery
+                let galleryHtml = '';
+                if (n.images && n.images.length > 0) {
+                    galleryHtml = `
+                        <div class="news-gallery">
+                            ${n.images.map(imgUrl => `
+                                <img src="${imgUrl}" class="news-image-thumb" onclick="openLightbox('${imgUrl}')" alt="ภาพประกอบข่าวสาร" onerror="this.style.display='none'">
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                // File Attachments
+                let filesHtml = '';
+                if (n.files && n.files.some(f => f.name || f.url)) {
+                    filesHtml = `
+                        <div class="attachments-container">
+                            <div class="attachments-title"><i class="fa-solid fa-paperclip"></i> เอกสารแนบประกอบข่าวสาร</div>
+                            <div class="file-list">
+                                ${n.files.map((file, i) => {
+                                    if (!file.name && !file.url) return '';
+                                    const fileName = file.name || `ไฟล์แนบที่ ${i+1}`;
+                                    const fileUrl = file.url || '#';
+                                    return `
+                                        <a href="${fileUrl}" target="_blank" class="file-btn" ${!file.url ? 'onclick="showToast(\'ไม่พบลิงก์ไฟล์แนบ\', \'warning\'); return false;"' : ''}>
+                                            <i class="fa-solid fa-file-pdf"></i> ${fileName}
+                                        </a>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Admin Controls
+                let adminActions = '';
+                if (appState.isAdmin) {
+                    adminActions = `
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-outline btn-sm" onclick="openEditNewsModal('${n.id}')"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDeleteNews('${n.id}')"><i class="fa-solid fa-trash"></i> ลบ</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <article class="news-card">
+                        <div class="news-header">
+                            <div>
+                                <span class="badge ${badgeClass}">${n.tag || 'ทั่วไป'}</span>
+                                <h3 class="news-title" style="margin-top:8px;">${n.title}</h3>
+                            </div>
+                            ${adminActions}
+                        </div>
+                        <div class="news-meta">
+                            <span><i class="fa-regular fa-calendar"></i> ${n.date || 'ไม่ระบุวันที่'}</span>
+                            <span><i class="fa-solid fa-user-gear"></i> งานวัดและประเมินผล</span>
+                        </div>
+                        <div class="news-body">${n.content}</div>
+                        ${galleryHtml}
+                        ${filesHtml}
+                    </article>
+                `;
+            }).join('');
+
+            // Render Load More Button Logic (5 items increment)
+            if (loadMoreSlot) {
+                if (totalNews > currentLimit) {
+                    const nextBatch = Math.min(5, totalNews - currentLimit);
+                    loadMoreSlot.innerHTML = `
+                        <button class="btn btn-outline" onclick="loadMoreNews()" style="padding:10px 24px; font-weight:500; font-size:0.95rem; border-color:var(--primary-color); color:var(--primary-color);">
+                            <i class="fa-solid fa-angles-down"></i> ดูข่าวประชาสัมพันธ์เพิ่มเติม (+${nextBatch} ข่าว | แสดง ${currentLimit} จาก ${totalNews})
+                        </button>
+                    `;
+                } else if (totalNews > 5 && currentLimit >= totalNews) {
+                    loadMoreSlot.innerHTML = `
+                        <div style="color:var(--text-muted); font-size:0.9rem; padding:12px 20px; font-weight:500; background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-sm); display:inline-flex; align-items:center; gap:8px;">
+                            <i class="fa-solid fa-circle-check" style="color:var(--primary-color);"></i> แสดงข่าวประชาสัมพันธ์ทั้งหมดเรียบร้อยแล้ว (${totalNews} ข่าว)
+                        </div>
+                    `;
+                } else {
+                    loadMoreSlot.innerHTML = '';
+                }
+            }
+        }
+
+        function loadMoreNews() {
+            appState.newsLimit = (appState.newsLimit || 5) + 5;
+            renderNewsFeed();
+            showToast('โหลดข่าวประชาสัมพันธ์เพิ่มเติมเรียบร้อย', 'info');
+        }
+
+        function openLightbox(imgUrl) {
+            document.getElementById('lightboxImg').src = imgUrl;
+            openModal('lightboxModal');
+        }
+
+        /* ==========================================================================
+           6. ADMIN AUTHENTICATION & CRUD HANDLERS
+           ========================================================================== */
+
+        function updateAdminUI() {
+            const group = document.getElementById('adminActionGroup');
+            const sidebarControls = document.getElementById('adminSidebarControls');
+            const badgeSlot = document.getElementById('adminBadgeSlot');
+
+            if (appState.isAdmin) {
+                group.innerHTML = `
+                    <button class="btn btn-danger btn-sm" onclick="logoutAdmin()">
+                        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
+                    </button>
+                `;
+                sidebarControls.style.display = 'flex';
+                badgeSlot.innerHTML = `<span class="badge badge-warning"><i class="fa-solid fa-shield-halved"></i> Admin</span>`;
+                document.body.classList.add('is-admin');
+            } else {
+                group.innerHTML = `
+                    <button class="btn btn-primary btn-sm" onclick="openModal('loginModal')">
+                        <i class="fa-solid fa-user-lock"></i> เข้าสู่ระบบ Admin
+                    </button>
+                `;
+                sidebarControls.style.display = 'none';
+                badgeSlot.innerHTML = '';
+                document.body.classList.remove('is-admin');
+            }
+
+            renderSidebarMenu();
+            renderNewsFeed();
+        }
+
+        // Login Handler
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+
+            if (u === 'admin' && p === 'admin752') {
+                appState.isAdmin = true;
+                closeModal('loginModal');
+                document.getElementById('loginForm').reset();
+                updateAdminUI();
+                showToast('เข้าสู่ระบบผู้ดูแลระบบ (Admin) สำเร็จ', 'success');
+            } else {
+                showToast('Username หรือ Password ไม่ถูกต้อง!', 'error');
+            }
+        };
+
+        function logoutAdmin() {
+            appState.isAdmin = false;
+            updateAdminUI();
+            showToast('ออกจากระบบผู้ดูแลระบบเรียบร้อย', 'info');
+        }
+
+        // News CRUD
+        function openAddNewsModal() {
+            document.getElementById('newsForm').reset();
+            document.getElementById('newsId').value = '';
+            document.getElementById('newsModalTitle').innerHTML = `<i class="fa-solid fa-newspaper"></i> เพิ่มข่าวประชาสัมพันธ์`;
+            openModal('newsModal');
+        }
+
+        function openEditNewsModal(id) {
+            const n = appState.news.find(item => item.id === id);
+            if (!n) return;
+            document.getElementById('newsId').value = n.id;
+            document.getElementById('newsTitleInput').value = n.title;
+            document.getElementById('newsTagInput').value = n.tag;
+            document.getElementById('newsContentInput').value = n.content;
+            document.getElementById('newsImagesInput').value = (n.images || []).join(', ');
+
+            document.getElementById('file1Name').value = n.files?.[0]?.name || '';
+            document.getElementById('file1Url').value = n.files?.[0]?.url || '';
+            document.getElementById('file2Name').value = n.files?.[1]?.name || '';
+            document.getElementById('file2Url').value = n.files?.[1]?.url || '';
+            document.getElementById('file3Name').value = n.files?.[2]?.name || '';
+            document.getElementById('file3Url').value = n.files?.[2]?.url || '';
+
+            document.getElementById('newsModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> แก้ไขข่าวประชาสัมพันธ์`;
+            openModal('newsModal');
+        }
+
+        // File Readers for News Attachments
+        function bindFilePicker(pickerId, nameInputId, urlInputId) {
+            document.getElementById(pickerId).addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (!document.getElementById(nameInputId).value) {
+                        document.getElementById(nameInputId).value = file.name;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        document.getElementById(urlInputId).value = evt.target.result;
+                        showToast(`เตรียมอัปโหลด ${file.name} (บันทึกลง Drive เมื่อกดบันทึก)`, 'info');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        bindFilePicker('file1Picker', 'file1Name', 'file1Url');
+        bindFilePicker('file2Picker', 'file2Name', 'file2Url');
+        bindFilePicker('file3Picker', 'file3Name', 'file3Url');
+
+        // Multi Image File Reader for News
+        document.getElementById('newsImagesFileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                let loadedCount = 0;
+                const newUrls = [];
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        newUrls.push(evt.target.result);
+                        loadedCount++;
+                        if (loadedCount === files.length) {
+                            const current = document.getElementById('newsImagesInput').value.trim();
+                            document.getElementById('newsImagesInput').value = current ? current + ',\n' + newUrls.join(',\n') : newUrls.join(',\n');
+                            showToast(`เตรียมอัปโหลด ${files.length} รูป (บันทึกลง Drive เมื่อกดบันทึก)`, 'info');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        document.getElementById('newsForm').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('newsId').value;
+            const title = document.getElementById('newsTitleInput').value.trim();
+            const tag = document.getElementById('newsTagInput').value;
+            const content = document.getElementById('newsContentInput').value.trim();
+            
+            const rawImages = document.getElementById('newsImagesInput').value;
+            const images = rawImages.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
+
+            const files = [
+                { name: document.getElementById('file1Name').value.trim(), url: document.getElementById('file1Url').value.trim() },
+                { name: document.getElementById('file2Name').value.trim(), url: document.getElementById('file2Url').value.trim() },
+                { name: document.getElementById('file3Name').value.trim(), url: document.getElementById('file3Url').value.trim() }
+            ];
+
+            const dateStr = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            if (id) {
+                const index = appState.news.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    appState.news[index] = { ...appState.news[index], title, tag, content, images, files };
+                    showToast('แก้ไขข่าวสารเรียบร้อย', 'success');
+                }
+            } else {
+                const newItem = {
+                    id: 'news-' + Date.now(),
+                    title, tag, content, images, files,
+                    date: dateStr
+                };
+                appState.news.unshift(newItem); // Latest on top
+                showToast('เพิ่มข่าวสารใหม่เรียบร้อย', 'success');
+            }
+
+            saveNewsState();
+            closeModal('newsModal');
+        };
+
+        function confirmDeleteNews(id) {
+            showSweetConfirm('ยืนยันการลบข่าวสาร?', 'ข่าวสารนี้จะถูกลบออกจากระบบอย่างถาวร', () => {
+                appState.news = appState.news.filter(n => n.id !== id);
+                saveNewsState();
+                showToast('ลบข่าวสารเรียบร้อย', 'info');
+            });
+        }
+
+        // External Systems CRUD
+        function openAddSystemModal() {
+            document.getElementById('systemForm').reset();
+            document.getElementById('systemId').value = '';
+            document.getElementById('systemModalTitle').innerHTML = `<i class="fa-solid fa-plus-circle"></i> เพิ่มระบบสารสนเทศภายนอก`;
+            openModal('systemModal');
+        }
+
+        function openEditSystemModal(id) {
+            const sys = appState.systems.find(s => s.id === id);
+            if (!sys) return;
+            document.getElementById('systemId').value = sys.id;
+            document.getElementById('systemNameInput').value = sys.name;
+            document.getElementById('systemUrlInput').value = sys.url;
+            document.getElementById('systemIconInput').value = sys.icon || 'fa-globe';
+            document.getElementById('systemModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> แก้ไขระบบสารสนเทศภายนอก`;
+            openModal('systemModal');
+        }
+
+        document.getElementById('systemForm').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('systemId').value;
+            const name = document.getElementById('systemNameInput').value.trim();
+            const url = document.getElementById('systemUrlInput').value.trim();
+            let icon = document.getElementById('systemIconInput').value.trim();
+            if (!icon) icon = 'fa-globe';
+
+            if (id) {
+                const index = appState.systems.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    appState.systems[index] = { id, name, url, icon };
+                    showToast('แก้ไขระบบสารสนเทศเรียบร้อย', 'success');
+                }
+            } else {
+                const newSys = { id: 'sys-' + Date.now(), name, url, icon };
+                appState.systems.push(newSys);
+                showToast('เพิ่มระบบสารสนเทศใหม่เรียบร้อย', 'success');
+            }
+
+            saveSystemsState();
+            closeModal('systemModal');
+        };
+
+        function confirmDeleteSystem(id) {
+            showSweetConfirm('ยืนยันการลบเมนูระบบ?', 'เมนูระบบนี้จะถูกลบออกจาก Sidebar', () => {
+                appState.systems = appState.systems.filter(s => s.id !== id);
+                if (appState.activeTab === id) {
+                    switchTab('home');
+                }
+                saveSystemsState();
+                showToast('ลบระบบสารสนเทศเรียบร้อย', 'info');
+            });
+        }
+
+        // Theme Customizer & Logo File Reader
+        document.getElementById('themeLogoFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    document.getElementById('themeLogoInput').value = evt.target.result;
+                    showToast('อัปโหลดโลโก้โรงเรียนเรียบร้อย', 'info');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('themeCustomizerForm').onsubmit = (e) => {
+            e.preventDefault();
+            
+            const scriptUrl = document.getElementById('googleScriptUrlInput').value.trim();
+            appState.googleScriptUrl = scriptUrl;
+            localStorage.setItem('saohai_script_url', scriptUrl);
+            updateDbStatusBadge();
+
+            appState.theme.logoUrl = document.getElementById('themeLogoInput').value.trim();
+            appState.theme.footerText = document.getElementById('themeFooterInput').value.trim();
+            appState.theme.colorPrimary = document.getElementById('colorPrimary').value;
+            appState.theme.colorPrimaryLight = document.getElementById('colorPrimaryLight').value;
+            appState.theme.colorAccentYellow = document.getElementById('colorAccentYellow').value;
+            appState.theme.colorSidebarTabBg = document.getElementById('colorSidebarTabBg').value;
+            appState.theme.colorSidebarTabActive = document.getElementById('colorSidebarTabActive').value;
+            appState.theme.colorTextColor = document.getElementById('colorTextColor').value;
+
+            saveThemeState();
+            closeModal('themeCustomizerModal');
+            showToast('บันทึกการปรับแต่งสี, โลโก้ และตั้งค่า DB เรียบร้อย', 'success');
+        };
+
+        function updateDbStatusBadge() {
+            const badge = document.getElementById('dbStatusBadge');
+            if (appState.googleScriptUrl) {
+                badge.className = 'badge badge-primary';
+                badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> เชื่อมต่อ Google Sheets DB แล้ว';
+            } else {
+                badge.className = 'badge badge-warning';
+                badge.innerHTML = 'ยังไม่ได้เชื่อมต่อ Sheets';
+            }
+        }
+
+        function openThemeCustomizerModal() {
+            document.getElementById('googleScriptUrlInput').value = appState.googleScriptUrl || '';
+            updateDbStatusBadge();
+
+            document.getElementById('themeLogoInput').value = appState.theme.logoUrl || '';
+            document.getElementById('themeFooterInput').value = appState.theme.footerText || '';
+            document.getElementById('colorPrimary').value = appState.theme.colorPrimary || '#3b7a57';
+            document.getElementById('colorPrimaryLight').value = appState.theme.colorPrimaryLight || '#7dbf96';
+            document.getElementById('colorAccentYellow').value = appState.theme.colorAccentYellow || '#fef08a';
+            document.getElementById('colorSidebarTabBg').value = appState.theme.colorSidebarTabBg || '#e8f5e9';
+            document.getElementById('colorSidebarTabActive').value = appState.theme.colorSidebarTabActive || '#3b7a57';
+            document.getElementById('colorTextColor').value = appState.theme.colorTextColor || '#1e293b';
+            openModal('themeCustomizerModal');
+        }
+
+        function openUserGuideModal() {
+            openModal('userGuideModal');
+        }
+
+        /* ==========================================================================
+           7. INITIALIZATION & EVENT BINDINGS
+           ========================================================================== */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+
+            // Mobile menu drawer toggle
+            document.getElementById('mobileMenuToggle').onclick = () => {
+                document.getElementById('appSidebar').classList.toggle('open');
+            };
+
+            // Top action buttons listeners
+            document.getElementById('btnThemeToggle').onclick = toggleDarkMode;
+            document.getElementById('btnUserGuide').onclick = openUserGuideModal;
+
+            // Initial UI state rendering
+            updateAdminUI();
+            renderSidebarMenu();
+            renderNewsFeed();
+
+            // Fetch live data from Google Sheets if URL is connected
+            if (appState.googleScriptUrl) {
+                fetchFromGoogleSheets();
+            }
+        });
+    </script>
+</body>
+</html>

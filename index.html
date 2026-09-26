@@ -1401,6 +1401,7 @@
     const STORAGE_KEY_THEME = 'saohai_theme_config';
     const STORAGE_KEY_AUTH = 'saohai_auth_state';
     const STORAGE_KEY_SCRIPT_URL = 'saohai_apps_script_url';
+    const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZSlWG6BIFF59vFP4ao2W3NAZ_trZ1xPgMwMQNuOocRz7O2-lO1kVIW9AUw8uMiylz/exec";
 
     // Preset Default Data
     const defaultNewsData = [
@@ -1467,6 +1468,9 @@
       { id: "sys_004", name: "ระบบจัดตารางเรียน-ตารางสอบ", url: "https://www.thairath.co.th", icon: "fa-solid fa-calendar-days" }
     ];
 
+    // 🔗 กำหนด URL ของ Google Apps Script Web App สำหรับดึงข้อมูลจาก Google Sheets & Drive (ทุกบราวเซอร์จะใช้ URL นี้อัตโนมัติ)
+    const DEFAULT_APPS_SCRIPT_URL = ""; 
+
     // State
     let newsList = [];
     let systemsList = [];
@@ -1477,25 +1481,45 @@
 
     // Initialize App
     async function initApp() {
-      appsScriptUrl = localStorage.getItem(STORAGE_KEY_SCRIPT_URL) || '';
+      appsScriptUrl = localStorage.getItem(STORAGE_KEY_SCRIPT_URL) || DEFAULT_APPS_SCRIPT_URL;
 
-      // Try fetching from Google Sheet DB if URL configured
+      // โหลดข้อมูลใน Local Storage สำรองไว้ก่อนเพื่อให้หน้าเว็บแสดงผลทันที (ไม่หมุนรอนาน)
+      loadLocalData();
+
+      // ดึงข้อมูลล่าสุดจาก Google Sheets (ถ้ามีการตั้งค่า Apps Script URL)
       if (appsScriptUrl) {
         try {
           const res = await fetch(appsScriptUrl);
           const data = await res.json();
-          if (data.status === 'success') {
-            if (data.news && data.news.length > 0) newsList = data.news;
-            if (data.systems && data.systems.length > 0) systemsList = data.systems;
-            if (data.theme) applyThemeObj(data.theme);
+          if (data && data.status === 'success') {
+            if (data.news && data.news.length > 0) {
+              newsList = data.news;
+              saveNewsToStorage();
+            }
+            if (data.systems && data.systems.length > 0) {
+              systemsList = data.systems;
+              saveSystemsToStorage();
+            }
+            if (data.theme && Object.keys(data.theme).length > 0) {
+              applyThemeObj(data.theme);
+              localStorage.setItem(STORAGE_KEY_THEME, JSON.stringify(data.theme));
+            }
           }
         } catch (e) {
-          console.warn('Google Sheet fetch error, fallback to local storage:', e);
-          loadLocalData();
+          console.warn('Google Sheet fetch error, using local cached data:', e);
         }
-      } else {
-        loadLocalData();
       }
+
+      loadThemeConfig();
+
+      if (localStorage.getItem(STORAGE_KEY_AUTH) === 'true') {
+        isAdmin = true;
+      }
+
+      renderSidebarMenu();
+      renderNewsFeed();
+      updateAuthUI();
+    }
 
       loadThemeConfig();
 

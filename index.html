@@ -726,6 +726,11 @@
       -webkit-overflow-scrolling: touch;
     }
 
+    /* Mobile Sidebar Backdrop override so drawer sits cleanly ON TOP */
+    #sidebarBackdrop {
+      z-index: 1500 !important;
+    }
+
     .modal-backdrop.active {
       opacity: 1;
       pointer-events: auto;
@@ -949,7 +954,7 @@
         bottom: 0;
         left: -290px;
         width: 280px;
-        z-index: 2500; /* Higher than modal-backdrop (z-index: 2000) */
+        z-index: 2500 !important; /* Higher than #sidebarBackdrop (z-index: 1500) */
         background-color: var(--sidebar-bg);
         box-shadow: var(--shadow-lg);
         transition: left 0.3s ease;
@@ -1651,20 +1656,29 @@
       if (config.footerText) document.getElementById('footerTextDisplay').textContent = config.footerText;
     }
 
+    let tempThemeBackup = null;
+
     function openThemeModal() {
       if (!isAdmin) return;
-      const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#4CAF50';
-      const secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim() || '#FFF59D';
-      document.getElementById('themePrimaryColor').value = primary;
-      document.getElementById('themeSecondaryColor').value = secondary;
-      document.getElementById('themeLogoInput').value = document.getElementById('siteLogo').src;
-      document.getElementById('themeFooterInput').value = document.getElementById('footerTextDisplay').textContent;
-      document.getElementById('appsScriptUrlInput').value = localStorage.getItem(STORAGE_KEY_SCRIPT_URL) || '';
+      
+      // Save original state backup before editing
+      tempThemeBackup = {
+        primaryColor: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#4CAF50',
+        secondaryColor: getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim() || '#FFF59D',
+        logoUrl: document.getElementById('siteLogo').src,
+        footerText: document.getElementById('footerTextDisplay').textContent,
+        scriptUrl: localStorage.getItem(STORAGE_KEY_SCRIPT_URL) || ''
+      };
 
-      const logoImgSrc = document.getElementById('siteLogo').src;
+      document.getElementById('themePrimaryColor').value = tempThemeBackup.primaryColor;
+      document.getElementById('themeSecondaryColor').value = tempThemeBackup.secondaryColor;
+      document.getElementById('themeLogoInput').value = tempThemeBackup.logoUrl;
+      document.getElementById('themeFooterInput').value = tempThemeBackup.footerText;
+      document.getElementById('appsScriptUrlInput').value = tempThemeBackup.scriptUrl;
+
       const preview = document.getElementById('logoPreview');
-      if (logoImgSrc) {
-        preview.src = logoImgSrc;
+      if (tempThemeBackup.logoUrl) {
+        preview.src = tempThemeBackup.logoUrl;
         preview.style.display = 'block';
       }
 
@@ -1672,6 +1686,14 @@
     }
 
     function closeThemeModal() {
+      // Revert any uncommitted theme/logo changes if user clicks Cancel or Close
+      if (tempThemeBackup) {
+        document.documentElement.style.setProperty('--primary-color', tempThemeBackup.primaryColor);
+        document.documentElement.style.setProperty('--secondary-color', tempThemeBackup.secondaryColor);
+        document.getElementById('siteLogo').src = tempThemeBackup.logoUrl;
+        document.getElementById('footerTextDisplay').textContent = tempThemeBackup.footerText;
+        tempThemeBackup = null;
+      }
       document.getElementById('themeModal').classList.remove('active');
     }
 
@@ -1682,7 +1704,7 @@
 
       showToast('กำลังประมวลผลไฟล์โลโก้...', 'info');
 
-      // Local Reader
+      // Local Reader - only updates preview and input value, NOT site logo until saved!
       const reader = new FileReader();
       reader.onload = async function(event) {
         const base64Data = event.target.result;
@@ -1741,7 +1763,8 @@
         postToAppsScript({ action: 'saveTheme', themeConfig: themeConfig });
       }
 
-      closeThemeModal();
+      tempThemeBackup = null; // Changes are saved, clear backup
+      document.getElementById('themeModal').classList.remove('active');
       showToast('บันทึกการตั้งค่าโทนสี โลโก้ และ Google Script เรียบร้อย', 'success');
     }
 
